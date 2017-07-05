@@ -1,0 +1,29 @@
+---
+title: "Database Import"
+output: html_notebook
+---
+
+```{r setup, echo=F, results='hide'}
+library(RMySQL)
+source("config.R")
+source("helpers.R")
+```
+
+> This R notebook can be executed from within R, you can update the database connection properties and the dataset settings in the `config.R` file, or run the commands specified here interactively if you want to experiment.
+
+When ready, the database can be imported executing the following command, which creates the `projects`, `files` and `stats` tables in the database:
+
+```{r}
+importDataset(DATASET_NAME, DATASET_PATH)
+```
+
+When done, SourcererCC results can also be imported:
+
+```{r}
+importSourcerer(DATASET_NAME, DATASET_PATH)
+```
+
+## Next Steps
+
+[Project Clones](5-project-clones.Rmd) in file `5-project-clones.Rmd`.
+

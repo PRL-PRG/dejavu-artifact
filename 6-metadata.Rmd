@@ -1,0 +1,60 @@
+---
+title: "7 - Metadata Acquisition"
+output: html_notebook
+---
+
+```{r setup, echo=F, results='hide'}
+library(RMySQL)
+source("config.R")
+source("helpers.R")
+```
+
+> This R notebook can be executed from within R, you can update the database connection properties and the dataset settings in the `config.R` file, or run the commands specified here interactively if you want to experiment. **Note that there are certain shell commands which the notebook itself will not execute.**
+
+Metadata from the paper come from two sources, one of them is the GitHub API, which we query about stars, users, etc. and the other one is number of commits per project, which we get from the `ghtorrent` snapshot. 
+
+## Metadata from Github
+
+To download the metadata, we provide a function that queries the database and downloads the metadata for projects into a `csv` file. The function may be distributed by using the extra `stride` and `strides` arguments, but for the sake of the VM, we can easily run w/o any distribution:
+
+```{r}
+downloadMetadata(DATASET_NAME, DATASET_PATH, GITHUB_TOKENS)
+```
+
+When done, the data can be imported, if multiple strides were used, an extra argument with their number must be added:
+
+```{r}
+importMetadata(DATASET_NAME, DATASET_PATH)
+```
+
+At this point, the `projects` table of the dataset should have extra columns for:
+
+- stars
+- subscribers 
+- number of forks
+- number of open issues
+
+Note that for the paper, only the number of stars was used. 
+
+## Number of commits
+
+
+The number of commits is obtained from GHTorrent's tables. Given the downloaded projects and the GHTorrent commits data (`projects_commits.csv`), we can run the `sccpreprocessor` to calculate the number of commits per project:
+
+    cd tools/sccpreprocessor/scc
+    java SccPreprocessor commits PATH_TO_DATASET PATH_TO_PROJECTS_COMMITS_GHTORRENT
+    cd ../../..
+
+To import the data, use the `importCommits` function in `functions.R`:
+
+```{r}
+importCommits(DATASET_NAME, DATASET_PATH)
+```
+
+Which adds the column `commits` to the projects table. 
+
+## Next Steps
+
+[Additional Processing](7-processing.Rmd) in file `7-processing.Rmd`.
+
+

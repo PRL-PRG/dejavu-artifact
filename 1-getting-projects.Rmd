@@ -1,0 +1,34 @@
+---
+title: "1 - Getting Github project urls"
+output: html_notebook
+---
+
+Download a snapshot of [GHTorrent MySQL dump](http://ghtorrent.org/downloads.html), and extract the projects table, such as:
+
+    mkdir ghtorrent
+    cd ghtorrent
+    curl https://ghtstorage.blob.core.windows.net/downloads/mysql-2017-01-19.tar.gz -o ghtorrent.tar.gz
+    tar --extract --file=ghtorrent.tar.gz mysql-2017-01-19/projects.csv
+    tar --extract --file=ghtorrent.tar.gz mysql-2017-01-19/project_commits.csv
+    mv mysql-2017-01-19/projects.csv projects.csv
+    mv mysql-2017-01-19/project_commits.csv project_commits.csv
+    rm -rf mysql-2017-01-19
+    cd ..
+    
+Note that the exact paths will differ based on the exact mysql snapshot used, but at the end of this step you should have the file `ghtorret/projects.csv` ready. 
+
+> The file `project_commits.csv` will be required for metadata acquisition in step 7. 
+
+For the paper, the following snapshots were used:
+
+- Javascript: 2016-11-01 (no longer available at GHTorrent site, archived at ginger)
+- Python, C++, Java: TODO
+
+## JavaScript
+
+Once the `projects.csv` file is created, the JavaScript downloader from the next step can be executed immediately. 
+
+## Next Steps
+
+[Downloading and tokenizing the projects](2-tokenizing.Rmd) in file `2-tokenizing.Rmd`.
+

@@ -1,0 +1,12 @@
+---
+title: "3 - SourcererCC Clone Analysis"
+output: html_notebook
+---
+
+
+> ! must end up with `sourcerer.csv`
+
+
+## Next Steps
+
+[Database Import](4-dbimport.Rmd) in file `4-dbimport.Rmd`.

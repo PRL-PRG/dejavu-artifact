@@ -1,0 +1,90 @@
+---
+title: "Data Analysis & Reporting"
+output: html_notebook
+---
+
+```{r setup, echo=F, results='hide'}
+library(RMySQL)
+library(ggplot2)
+source("config.R")
+source("helpers.R")
+```
+
+> This R notebook can be executed from within R, you can update the database connection properties and the dataset settings in the `config.R` file, or run the commands specified here interactively if you want to experiment.
+
+In the last section of the artifact, all the graphs, tables & values used in the paper will be recreated. 
+
+## Fig 1 - Heatmap
+
+```{r}
+heatmap = read.csv(paste(DATASET_PATH, "/heatmap.csv", sep=""), header = F, col.names = c("pid", "stars", "commits", "files", "originalFiles","containsClones"))
+createHeatmap(DATASET_NAME, DATASET_PATH, "commits")
+```
+
+## Table 1 - Corpus
+
+
+
+#projects(total) 3,506,219 1,130,879 2,340,845 4,479,173 #projects(non-fork) 1,859,001 554,008 1,096,246 2,011,875 #URLsprocessed 631,390 554,008 1,096,246 916,059 #projects(downloaded) 479,113 369,440 909,290 916,082 #projects(analyzed) 473,562 364,155 893,197 903,558 #files(analyzed) 29,592,071 61,647,575 31,602,780 135,712,428
+Medians
+Filesperproject 11 11 5 7 SLOCperfile 42 55 46 28 Starsperproject 0 0 0 0 Commitsperproject 
+
+## Table 2 - File Level Duplication
+
+Totalfiles 29,592,071 61,647,575 31,602,780 135,712,428 Filehashes 19,174,398(65%) 16,384,801(27%) 9,157,622(29%) 9,196,478(7%) Tokenhashes 17,857,684(60%) 14,425,319(23%) 8,620,326(27%) 7,943,665(6%) SCCdupfiles 7,621,073 6,200,301 2,732,747 2,859,728 SCCuniquefiles 10,236,611 8,225,018 5,887,579 5,083,937
+
+## Fig 3 - File Level Duplication
+
+    SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash GROUP BY tokenHash
+    
+```{r}
+logHistogram(DATASET_NAME, "SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash GROUP BY tokenHash", DATASET_NAME, "Clone Group Size", "% of groups", "file-clone-group-sizes.pdf")
+```
+
+
+## Table 3 - File Level Duplication Excluding Small Files
+
+## Fig 4 - File Level Duplication Excluding Small Files
+
+> This comes from pedro's data, we might want to import them, or know how we arrived to them
+
+## Table 4 - Inter Project Cloning
+
+## Fig 5 - Percentage of project clones at various levels of overlap.
+
+## Table 5 -  Number of tokens per file within certain percentiles of the distribution of file size.
+
+## Table 6 - Corpus for Metadata Analysis.
+
+## Fig 10 - Files per project distributions.
+
+```{r}
+logHistogramFromDF(heatmap, "files", DATASET_NAME, "Files per Project", "% of Projects", "Hist_files_per_project.pdf")
+```
+
+
+## Fig 11 - SLOC per file distributions.
+
+```{r}
+logHistogram(DATASET_NAME, "SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash ORDER BY RAND() LIMIT 1000000", DATASET_NAME, "SLOC", "% of projects", "Hist_sloc_per_file.pdf")
+```
+
+
+## Fig 12 - Stars per project distributions.
+
+```{r}
+logHistogramFromDF(heatmap, "stars", DATASET_NAME, "Stars", "% of Projects", "Hist_stars_per_project.pdf")
+```
+
+
+## Fig 13 - Commits per project distributions.
+
+```{r}
+logHistogramFromDF(heatmap, "commits", DATASET_NAME, "Stars", "% of Projects", "Hist_commits_per_project.pdf")
+```
+
+## Table 7 -  Summary statistics for the entire dataset.
+
+## Table 8 - Summary statistics for the minimum set of files (distinct token hashes).
+
+## Table 9 - Summary statistics for the minimum set of files (distinct file hashes).

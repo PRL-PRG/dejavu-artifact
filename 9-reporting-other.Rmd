@@ -1,0 +1,68 @@
+---
+title: "9 - Language specific reporting"
+output: html_notebook
+---
+
+```{r setup, echo=F, results='hide'}
+library(RMySQL)
+library(ggplot2)
+source("config.R")
+source("helpers.R")
+```
+
+> This R notebook can be executed from within R, you can update the database connection properties and the dataset settings in the `config.R` file, or run the commands specified here interactively if you want to experiment. **Note that this notebook is only valid when javascript pipeline datasets are used.**
+
+## Fig 6 - JavaScript files over time, with and without NPM files.
+
+## Fig 7 -  Percentage of clones over time
+
+## Fig 8 - % of NPM files in projects and directly imported NPM packages
+
+```{r}
+query = paste("SELECT 100 - (y.files / x.files) * 100  FROM projects AS x JOIN ", DATASET_NAME, "_nonpm.projects AS y ON x.projectId = y.projectId WHERE x.files != y.files", sep="")
+normalHistogram(DATASET_NAME, query, "% of NPM files", "% of NPM files", "% of projects", "npm_proj_pct.pdf")
+```
+
+```{r}
+normalHistogram(DATASET_NAME, "SELECT COUNT(DISTINCT blameModule) FROM files_nm JOIN files ON files_nm.fileId = files.fileId WHERE npmDepth > 0 GROUP BY projectId", "Direct Imports per Module", "# of modules directly imported", "% of projects", "npm_direct.pdf")
+```
+
+## Fig 9 - Popularity of NPM modules.
+
+```{r}
+normalHistogramLogY(DATASET_NAME, "SELECT count FROM (SELECT COUNT(DISTINCT projectId) AS count FROM files_nm JOIN files ON files_nm.fileId = files.fileId WHERE npmDepth> 0 GROUP BY blameModule) AS x WHERE count > 0", "Module popularity", "How many projects directly import a module", "# of modules", "npm_pop.pdf")
+```
+
+# NPM and non-NPM Versions of Common Graphs
+
+## Figuree 3
+
+```{r}
+logHistogramDouble(DATASET_NAME, "SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash GROUP BY tokenHash", "all", "no NPM", "JavaScript", "Clone Group Size", "% of projects", "file-clone-group-sizes-npm.pdf")
+```
+
+
+## Files per project 
+
+```{r}
+logHistogramDouble(DATASET_NAME, "SELECT files FROM projects", "all", "no NPM", "JavaScript", "Files per Project", "% of projects", "Hist_files_per_project_npm.pdf")
+```
+
+## SLOC per file
+
+```{r}
+logHistogramDouble(DATASET_NAME, "SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash ORDER BY RAND() LIMIT 1000000", "all", "no NPM", "JavaScript", "SLOC", "% of projects", "Hist_sloc_per_file_npm.pdf")
+```
+
+## Stars per Project
+
+```{r}
+logHistogramDouble(DATASET_NAME, "SELECT stars FROM projects", "all", "no NPM", "JavaScript", "Stars", "% of projects", "Hist_stars_per_project_js2.pdf", paste("SELECT stars FROM projects JOIN ", DATASET_NAME, ".projects AS x ON projects.projectId = x.projectId WHERE projects.files = x.files", sep=""))
+```
+
+
+## Commits per project
+
+```{r}
+logHistogramDouble(DATASET_NAME, "SELECT commits FROM projects", "all", "no NPM", "JavaScript", "Commits", "% of projects", "Hist_commits_per_project_js2.pdf", paste("SELECT commits FROM projects JOIN ", DATASET_NAME, ".projects AS x ON projects.projectId = x.projectId WHERE projects.files = x.files", sep=""))
+```
