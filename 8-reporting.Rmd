@@ -23,38 +23,113 @@ createHeatmap(DATASET_NAME, DATASET_PATH, "commits")
 
 ## Table 1 - Corpus
 
-
-
-#projects(total) 3,506,219 1,130,879 2,340,845 4,479,173 #projects(non-fork) 1,859,001 554,008 1,096,246 2,011,875 #URLsprocessed 631,390 554,008 1,096,246 916,059 #projects(downloaded) 479,113 369,440 909,290 916,082 #projects(analyzed) 473,562 364,155 893,197 903,558 #files(analyzed) 29,592,071 61,647,575 31,602,780 135,712,428
-Medians
-Filesperproject 11 11 5 7 SLOCperfile 42 55 46 28 Starsperproject 0 0 0 0 Commitsperproject 
+```{r}
+f <- function() {
+    sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = DATASET_NAME, host = DB_HOST)
+    println("Counts:")
+    println("  Projects (total)         ")
+    println("  Projects (non-fork)      ")
+    println("  URLs processed           ")
+    println("  Projects downloaded      ", sql.query("SELECT COUNT(*) FROM projects"))
+    println("  Projects analyzed        ", sql.query("SELECT COUNT(*) FROM projects WHERE files > 0"))
+    println("  Files analyzed           ", sql.query("SELECT COUNT(*) FROM files"))
+    println("Means:")
+    println("  Files per project        ",mean(sql.query("SELECT files FROM projects")[[1]]))
+    println("  SLOC per file            ",mean(sql.query("SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    println("  Stars per project        ",mean(sql.query("SELECT stars FROM projects")[[1]]))
+    println("  Commits per project      ",mean(sql.query("SELECT commits FROM projects")[[1]]))
+    sql.disconnect()
+}
+f()
+```
 
 ## Table 2 - File Level Duplication
 
-Totalfiles 29,592,071 61,647,575 31,602,780 135,712,428 Filehashes 19,174,398(65%) 16,384,801(27%) 9,157,622(29%) 9,196,478(7%) Tokenhashes 17,857,684(60%) 14,425,319(23%) 8,620,326(27%) 7,943,665(6%) SCCdupfiles 7,621,073 6,200,301 2,732,747 2,859,728 SCCuniquefiles 10,236,611 8,225,018 5,887,579 5,083,937
+```{r}
+f <- function() {
+    sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = DATASET_NAME, host = DB_HOST)
+    totalFiles = sql.query("SELECT COUNT(*) FROM files")[[1]]
+    fileHashes = sql.query("SELECT COUNT(*) FROM stats")[[1]]
+    tokenHashes = sql.query("SELECT COUNT(DISTINCT tokenHash) FROM stats")[[1]]
+    println("Total files                ", totalFiles)
+    println("File hashes                ", fileHashes, " (", fileHashes/totalFiles, "%)")
+    println("Token hashes               ", tokenHashes, " (", tokenHashes/totalFiles, "%)")
+    println("SCCdupfiles                ")
+    println("SCCuniquefiles             ")
+    sql.disconnect()
+}
+f()
+```
 
 ## Fig 3 - File Level Duplication
 
-    SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash GROUP BY tokenHash
-    
-```{r}
-logHistogram(DATASET_NAME, "SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash GROUP BY tokenHash", DATASET_NAME, "Clone Group Size", "% of groups", "file-clone-group-sizes.pdf")
-```
-
+> Done in EXCEL
 
 ## Table 3 - File Level Duplication Excluding Small Files
 
+```{r}
+f <- function() {
+    sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = DATASET_NAME, host = DB_HOST)
+    totalFiles = sql.query("SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash WHERE totalTokens >= 50")[[1]]
+    fileHashes = sql.query("SELECT COUNT(*) FROM stats WHERE totalTokens >= 50")[[1]]
+    tokenHashes = sql.query("SELECT COUNT(DISTINCT tokenHash) FROM stats WHERE totalTokens >= 50")[[1]]
+    println("Total files                ", totalFiles)
+    println("File hashes                ", fileHashes, " (", fileHashes/totalFiles, "%)")
+    println("Token hashes               ", tokenHashes, " (", tokenHashes/totalFiles, "%)")
+    println("SCCdupfiles                ")
+    println("SCCuniquefiles             ")
+    sql.disconnect()
+}
+f()
+```
+
 ## Fig 4 - File Level Duplication Excluding Small Files
 
-> This comes from pedro's data, we might want to import them, or know how we arrived to them
+> Done in EXCEL
 
 ## Table 4 - Inter Project Cloning
 
+```{r}
+f <- function() {
+    sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = DATASET_NAME, host = DB_HOST)
+    println("Projects analyzed          ", sql.query("SELECT COUNT(*) FROM projects WHERE files > 0"))
+    println("Clones >=50%               ", sql.query("select count(*) from (select distinct cloneId from projectClones where cloneCloningPercent >= 50 union select distinct hostId from projectClones where hostAffectedPercent >= 50) as combined"))
+    println("Clones >=80%               ", sql.query("select count(*) from (select distinct cloneId from projectClones where cloneCloningPercent >= 80 union select distinct hostId from projectClones where hostAffectedPercent >= 80) as combined"))
+    println("Clones 100%                ", sql.query("select count(*) from (select distinct cloneId from projectClones where cloneCloningPercent = 100 union select distinct hostId from projectClones where hostAffectedPercent = 100) as combined"))
+    println("exact dups                 ", sql.query("select count(*) from (select distinct cloneId from projectClones where cloneCloningPercent = 100 and hostAffectedPercent = 100 union select distinct hostId from projectClones where cloneCloningPercent = 100 and hostAffectedPercent = 100) as combined"))
+    println("exact dups (>= files)      ", sql.query("select count(*) from (select distinct cloneId from projectClones where cloneCloningPercent = 100 and hostAffectedPercent = 100 and cloneTotalFiles >= 10 union select distinct hostId from projectClones where cloneCloningPercent = 100 and hostAffectedPercent = 100 and hostTotalFiles >= 10) as combined"))
+    sql.disconnect()
+}
+f()
+```
+
 ## Fig 5 - Percentage of project clones at various levels of overlap.
+
+> Done in EXCEL
 
 ## Table 5 -  Number of tokens per file within certain percentiles of the distribution of file size.
 
+```{r}
+f <- function() {
+    sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = DATASET_NAME, host = DB_HOST)
+    x = sql.query("SELECT totalTokens FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]
+    sql.disconnect()
+    quantile(x, c(.20,0.30,.45,.55,.70,.80,.90))
+}
+f()
+```
+
 ## Table 6 - Corpus for Metadata Analysis.
+
+```{r}
+f <- function() {
+    sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = DATASET_NAME, host = DB_HOST)
+    println("Projects analyzed          ", sql.query("SELECT COUNT(*) FROM projects WHERE files > 0"))
+    println("Projects with 1+ commits   ", sql.query("SELECT COUNT(*) FROM projects WHERE files > 0 AND commits > 0"))
+    sql.disconnect()
+}
+f()
+```
 
 ## Fig 10 - Files per project distributions.
 
@@ -85,6 +160,67 @@ logHistogramFromDF(heatmap, "commits", DATASET_NAME, "Stars", "% of Projects", "
 
 ## Table 7 -  Summary statistics for the entire dataset.
 
+```{r}
+f <- function() {
+    sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = DATASET_NAME, host = DB_HOST)
+    println("Files per project")
+    print(summary(sql.query("SELECT files FROM projects")[[1]]))
+    println("Bytes per file")
+    print(summary(sql.query("SELECT fileBytes FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    println("Lines per file")
+    print(summary(sql.query("SELECT fileLines FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    println("LOC per file")
+    print(summary(sql.query("SELECT fileLOC FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    println("SLOC per file")
+    print(summary(sql.query("SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    println("Distinct tokens per file")
+    print(summary(sql.query("SELECT uniqueTokens FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    sql.disconnect()
+}
+f()
+```
+
 ## Table 8 - Summary statistics for the minimum set of files (distinct token hashes).
 
+```{r}
+f <- function() {
+    sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = DATASET_NAME, host = DB_HOST)
+    println("Files per project")
+    print(summary(sql.query("SELECT COUNT(*) FROM (SELECT MIN(projectId) AS pid, COUNT(*) AS cnt FROM files JOIN stats ON files.fileHash = stats.fileHash GROUP BY tokenHash) AS x WHERE x.cnt = 1 GROUP BY x.pid")[[1]]))
+    println("Bytes per file")
+    print(summary(sql.query("SELECT AVG(fileBytes) FROM stats GROUP BY tokenHash")[[1]]))
+    println("Lines per file")
+    print(summary(sql.query("SELECT AVG(fileLines) FROM stats GROUP BY tokenHash")[[1]]))
+    println("LOC per file")
+    print(summary(sql.query("SELECT AVG(fileLOC) FROM stats GROUP BY tokenHash")[[1]]))
+    println("SLOC per file")
+    print(summary(sql.query("SELECT AVG(fileSLOC) FROM stats GROUP BY tokenHash")[[1]]))
+    println("Distinct tokens per file")
+    print(summary(sql.query("SELECT AVG(uniqueTokens) FROM stats GROUP BY tokenHash")[[1]]))
+    sql.disconnect()
+}
+f()
+```
+
 ## Table 9 - Summary statistics for the minimum set of files (distinct file hashes).
+
+```{r}
+f <- function() {
+    #SELECT COUNT(*) FROM (SELECT MIN(projectId) AS pid, COUNT(*) AS cnt FROM files GROUP BY fileHash) AS x WHERE x.cnt = 1 GROUP BY x.pid
+    sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = DATASET_NAME, host = DB_HOST)
+    println("Files per project")
+    print(summary(sql.query("SELECT COUNT(*) FROM (SELECT MIN(projectId) AS pid, COUNT(*) AS cnt FROM files GROUP BY fileHash) AS x WHERE x.cnt = 1 GROUP BY x.pid")[[1]]))
+    println("Bytes per file")
+    print(summary(sql.query("SELECT fileBytes FROM stats")[[1]]))
+    println("Lines per file")
+    print(summary(sql.query("SELECT fileLines FROM stats")[[1]]))
+    println("LOC per file")
+    print(summary(sql.query("SELECT fileLOC FROM stats")[[1]]))
+    println("SLOC per file")
+    print(summary(sql.query("SELECT fileSLOC FROM stats")[[1]]))
+    println("Distinct tokens per file")
+    print(summary(sql.query("SELECT uniqueTokens FROM stats")[[1]]))
+    sql.disconnect()
+}
+f()
+```

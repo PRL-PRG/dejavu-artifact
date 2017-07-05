@@ -64,6 +64,14 @@ importAndCreateJS_NPM(paste(DATASET_NAME, "nonpm", sep = "_"), DATASET_NAME, DAT
 
 fileId, cdate, npm, bower, test, minjs, thash
 
+```{r}
+exportAggregationData(DATASET_NAME, DATASET_PATH)
+```
+
+
+
+
+
 ## Next Steps
 
 [Project Clones](6-project-clones.Rmd) in file `6-project-clones.Rmd`.
