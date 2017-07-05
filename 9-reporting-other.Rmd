@@ -14,6 +14,8 @@ source("helpers.R")
 
 ## Fig 6 - JavaScript files over time, with and without NPM files.
 
+
+
 ## Fig 7 -  Percentage of clones over time
 
 ## Fig 8 - % of NPM files in projects and directly imported NPM packages

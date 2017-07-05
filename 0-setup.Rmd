@@ -7,7 +7,7 @@ This notebook details the necessary setup & tools required to reproduce the pape
 
 ## Prerequisites
 
-`curl`, `git`, `Java`, `Python`, `C++/C`, `cmake`, `R`, and `MySQL`/`MariaDB` are required to be able to reproduce the paper results. On linux machines, these can be easily installed using the system's package manager. Other operating systems might work too (e.g. WSL on Windows, or brew on OSX), but were not tested.
+`ant`, `curl`, `git`, `Java`, `Python`, `C++/C`, `cmake`, `R`, and `MySQL`/`MariaDB` are required to be able to reproduce the paper results. On linux machines, these can be easily installed using the system's package manager. Other operating systems might work too (e.g. WSL on Windows, or brew on OSX), but were not tested.
 
 ## Installing Tools
 

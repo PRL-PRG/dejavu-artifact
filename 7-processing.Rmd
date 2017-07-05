@@ -60,6 +60,10 @@ When done, the file can be imported into the database and a database with `_nonp
 importAndCreateJS_NPM(paste(DATASET_NAME, "nonpm", sep = "_"), DATASET_NAME, DATASET_PATH)
 ```
 
+## Aggregation of files and projects
+
+fileId, cdate, npm, bower, test, minjs, thash
+
 ## Next Steps
 
 [Project Clones](6-project-clones.Rmd) in file `6-project-clones.Rmd`.

@@ -468,6 +468,15 @@ exportHeatmapData <- function(dbName, outputFolder) {
     sql.disconnect();
 }
 
+exportAggregationData <- function(dbName, outputFolder) {
+    // fileId, cdate, npm, bower, test, minjs, thash
+    sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = dbName, host = DB_HOST)
+    println("exporting projects_heat.csv")
+    sql.query("SELECT fileId, createdAt, npm, bower, test, minjs, tokenHashprojectId, stars, commits FROM projects INTO OUTFILE \"", outputFolder, "/projects_heat.csv\" FIELDS TERMINATED BY ','");
+    sql.disconnect();
+    
+}
+
 # when project level cloning is calculated, loads it in the database
 importCloneFinderData <- function(dbName, inputFolder, numThreads) {
     sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = dbName, host = DB_HOST)
