@@ -12,7 +12,7 @@ First, copy the tokenized files into a location where SourcererCC will look for 
 
 ```{bash}
 cd $R_NOTEBOOK_HOME
-cd tools/SourcererCC/clone_detector
+cd tools/SourcererCC/clone-detector
 cp ../../../datasets/js/tokenized_files.csv input/dataset/blocks.file
 ```
     
@@ -20,13 +20,17 @@ Then, run SourcererCC by invoking the controller:
 
 ```{bash}
 cd $R_NOTEBOOK_HOME
+cd tools/SourcererCC/clone-detector
 python controller.py
 ```
+
+> Running this chunk takes some time (minutes to tenths of minutes).
     
 SourcererCC runs distributed across multiple nodes and when finished, the result from the nodes must be joined together into a `sourcerer.csv` file in the dataset. Assuming 2 nodes were used, the following command should be executed:
 
 ```{bash}
 cd $R_NOTEBOOK_HOME
+cd tools/SourcererCC/clone-detector
 cat NODE_*/output8.0/query_* > ../../../datasets/js/sourcerer.csv
 ```
     

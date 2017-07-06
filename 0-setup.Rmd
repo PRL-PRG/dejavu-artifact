@@ -46,6 +46,7 @@ rm -rf downloads
 # prepare directories
 mkdir -p tools
 mkdir -p downloads/js
+mkdir -p graphs/js
 ```
 
 ### Sourcerer CC
@@ -116,9 +117,6 @@ make
 
 Clone finder analyses the project-level cloning among the downloader projects.
 
-> Currently this clone finder is used only for JavaScript, but it should be completely compatible with other languages as well. Unlike the python version, works from csv files and does all computations in memory.
-
-    
 ## Other Considerations
 
 Install required R packages:

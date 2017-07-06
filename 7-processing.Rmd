@@ -66,6 +66,12 @@ fileId, cdate, npm, bower, test, minjs, thash
 exportAggregationData(DATASET_NAME, DATASET_PATH)
 ```
 
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools/sccpreprocessor/src
+java SccPreprocessor aggregate ../../../datasets/js
+```    
+
 ## Next Steps
 
 [Reporting](8-reporting.nb.html) in file [`8-reporting.Rmd`](8-reporting.Rmd).

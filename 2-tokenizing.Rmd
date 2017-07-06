@@ -17,7 +17,7 @@ tools/js-tokenizer/build/tokenizer JavaScript ghtorrent/projects.csv 2 0 downloa
 tools/js-tokenizer/build/tokenizer JavaScript ghtorrent/projects.csv 2 1 downloads/js quiet
 ```
     
-> In production, the tokenizer and downloader are also parallelizable and can utilize multiple threads for its subtasks, however for the sake of running in the VM, the thread counts were limited to 1 per subtask. 
+> Running this chunk may take, depending on your connection & hardware some time (minutes to tenths of minutes). In production, the tokenizer and downloader are also parallelizable and can utilize multiple threads for its subtasks, however for the sake of running in the VM, the thread counts were limited to 1 per subtask. 
     
 When the strides are downloaded, the data must be merged using the ght tool:
 
