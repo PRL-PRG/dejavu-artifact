@@ -51,11 +51,12 @@ f <- function() {
     totalFiles = sql.query("SELECT COUNT(*) FROM files")[[1]]
     fileHashes = sql.query("SELECT COUNT(*) FROM stats")[[1]]
     tokenHashes = sql.query("SELECT COUNT(DISTINCT tokenHash) FROM stats")[[1]]
+    sccDup = sql.query("SELECT COUNT(id) FROM (SELECT fileId1 AS id FROM CCPairs UNION SELECT fileId2 AS id FROM CCPairs) AS x")[[1]]
     println("Total files                ", totalFiles)
     println("File hashes                ", fileHashes, " (", fileHashes/totalFiles, "%)")
     println("Token hashes               ", tokenHashes, " (", tokenHashes/totalFiles, "%)")
-    println("SCCdupfiles                ")
-    println("SCCuniquefiles             ")
+    println("SCCdupfiles                ", sccDup)
+    println("SCCuniquefiles             ", tokenHashes - sccDup, "(", (tokenHashes - sccDup) / totalFiles, "%)")
     sql.disconnect()
 }
 f()
@@ -73,11 +74,12 @@ f <- function() {
     totalFiles = sql.query("SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash WHERE totalTokens >= 50")[[1]]
     fileHashes = sql.query("SELECT COUNT(*) FROM stats WHERE totalTokens >= 50")[[1]]
     tokenHashes = sql.query("SELECT COUNT(DISTINCT tokenHash) FROM stats WHERE totalTokens >= 50")[[1]]
+    sccDup = sql.query("SELECT COUNT(id) FROM (SELECT fileId1 AS id FROM CCPairs UNION SELECT fileId2 AS id FROM CCPairs) AS x JOIN files ON id = fileId JOIN stats ON files.fileHash = stats.fileHash WHERE totalTokens >=50")[[1]]
     println("Total files                ", totalFiles)
     println("File hashes                ", fileHashes, " (", fileHashes/totalFiles, "%)")
     println("Token hashes               ", tokenHashes, " (", tokenHashes/totalFiles, "%)")
-    println("SCCdupfiles                ")
-    println("SCCuniquefiles             ")
+    println("SCCdupfiles                ", sccDup)
+    println("SCCuniquefiles             ", tokenHashes - sccDup, "(", (tokenHashes - sccDup) / totalFiles, "%)")
     sql.disconnect()
 }
 f()

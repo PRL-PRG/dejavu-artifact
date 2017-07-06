@@ -77,6 +77,8 @@ createHeatmap <- function(datasetName, datasetPath, y_axis = "commits") {
     g
 }
 
+
+
 # graphs --------------------------------------------------------------------------------------------------------------
 
 logHistogram <- function(dbname, query, title, xtitle, ytitle, filename = NULL) {
@@ -262,6 +264,155 @@ logHistogramDouble = function(db1, query, db1Title, db2Title, title, xtitle, yti
     if (!is.null(filename))
         ggsave(paste("graphs/", db1, "/filename", ".pdf", sep=""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
     g
+}
+
+filesOverTime = function(outputFolder, js_aggregate, filename) {
+    cols <- c(
+        "non-test duplicates"="#a0a0a0",
+        "test duplicates"="#808080",
+        "npm non-test"="#606060",
+        "npm test"="#404040",
+        "unique tests"="#202020",
+        "unique files"="#000000"
+    )
+    data = data.frame(
+        time = js_aggregate$time,
+        unique = sum(js_aggregate, npm = F, thUnique = T, tests = F),
+        uniqueTests = sum(js_aggregate, npm = F, thUnique = T),
+        npmTests = sum(js_aggregate, npm = T, tests = T),
+        npmNonTest = sum(js_aggregate, npm = T),
+        dupTests = sum(js_aggregate, npm = F, thUnique = F, tests = T),
+        all = sum(js_aggregate))
+    g = ggplot(data, aes(x = time))
+    g = g + geom_area(aes(y = all, fill = "non-test duplicates"))
+    g = g + geom_area(aes(y = dupTests + npmNonTest + uniqueTests, fill = "test duplicates"))
+    g = g + geom_area(aes(y = npmNonTest + uniqueTests, fill = "npm non-test"))
+    g = g + geom_area(aes(y = npmTests + uniqueTests, fill = "npm test"))
+    g = g + geom_area(aes(y = uniqueTests, fill = "unique tests"))
+    g = g + geom_area(aes(y = unique, fill = "unique files"))
+    g = g + scale_x_continuous("Date", limits = c(87, 212), labels = function(x) sapply(x, month.text))
+    g = g + scale_y_continuous("Files", labels = plain)
+    #g = g + scale_fill_identity(guide = 'legend', labels = c("haha", "bubu", "gaga"))
+    #g = g + guides(fill=guide_legend(title="New Legend Title"))
+    g = g + scale_fill_manual(name = "Legend", values=cols, breaks = names(cols))
+    g = g + ggtitle("Files over time")
+    g = g + theme(plot.title = element_text(hjust = 0.5))
+    ggsave(paste(outputFolder, "/", filename, sep = ""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
+    g
+}
+
+nonNpmFilesOverTime = function(outputFolder, js_aggregate, filename) {
+    cols <- c(
+        "non-test duplicates"="#c0c0c0",
+        "test duplicates"="#808080",
+        "unique tests"="#404040",
+        "unique files"="#000000",
+        "NPM files" = "dashed"
+    )
+    data = data.frame(
+        time = js_aggregate$time,
+        unique = sum(js_aggregate, npm = F, thUnique = T, tests = F),
+        uniqueTests = sum(js_aggregate, npm = F, thUnique = T),
+        dupTests = sum(js_aggregate, npm = F, thUnique = F, tests = T),
+        dup = sum(js_aggregate, npm = F),
+        npm = sum(js_aggregate, npm = T))
+    g = ggplot(data, aes(x = time))
+    g = g + geom_area(aes(y = dup, fill = "non-test duplicates"))
+    g = g + geom_area(aes(y = dupTests + uniqueTests, fill = "test duplicates"))
+    g = g + geom_area(aes(y = uniqueTests, fill = "unique tests"))
+    g = g + geom_area(aes(y = unique, fill = "unique files"))
+    g = g + geom_line(aes(y = npm, linetype = "NPM files"))
+    g = g + scale_x_continuous("Date", limits = c(87, 212), labels = function(x) sapply(x, month.text))
+    g = g + scale_y_continuous("Files", limits = c(0, max(data$dup)), labels = plain)
+    g = g + scale_fill_manual(name = "Legend", values=cols, breaks = names(cols))
+    g = g + scale_linetype_manual(name=" ", values = cols)
+    g = g + ggtitle("Non - NPM Files over time")
+    g = g + theme(plot.title = element_text(hjust = 0.5))
+    ggsave(paste(outputFolder, "/", filename, sep = ""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
+    g
+}
+
+nonUniqueFilesOverTime = function(outputFolder, js_aggregate, filename) {
+    cols <- c(
+        "# of all files"="#c0c0c0",
+        "# of NPM files"="#a0a0a0",
+        "all files" = "solid",
+        "NPM" = "dotted",
+        "non-NPM" = "dashed",
+        "non-NPM tests" = "dotdash"
+    )
+    x = sum(js_aggregate)
+    maxx = max(x)
+    minx = min(x)
+    data = data.frame(
+        time = js_aggregate$time,
+        all = sum(js_aggregate) * 30 / maxx,
+        npm = sum(js_aggregate, npm = T) * 30 / maxx,
+        pctAll = 100 - sum(js_aggregate, thUnique = T) * 100 / sum(js_aggregate),
+        pctNPM = 100 - sum(js_aggregate, npm = T, thUnique = T) * 100 / sum(js_aggregate,npm = T),
+        pctNonNPM = 100 - sum(js_aggregate, npm = F, thUnique = T) * 100 / sum(js_aggregate, npm = F),
+        pctNonNPMTest = 100 - sum(js_aggregate, npm = F, tests = T, thUnique = T) * 100 / sum(js_aggregate, npm = F, tests = T))
+    g = ggplot(data, aes(x = time))
+    g = g + geom_area(aes(y = all, fill = "# of all files"), position = position_nudge(y = 70))
+    g = g + geom_area(aes(y = npm, fill = "# of NPM files"), position = position_nudge(y = 70))
+    g = g + geom_line(aes(y = pctAll, linetype = "all files"))
+    g = g + geom_line(aes(y = pctNPM, linetype = "NPM"))
+    g = g + geom_line(aes(y = pctNonNPM, linetype = "non-NPM"))
+    g = g + geom_line(aes(y = pctNonNPMTest, linetype = "non-NPM tests"))
+    g = g + scale_x_continuous("Date", limits = c(109, 212), labels = function(x) sapply(x, month.text), breaks = c(106,118, 130, 142, 154, 166, 178, 190, 202, 212))
+    g = g + scale_y_continuous("%", labels = plain)
+    g = g + coord_cartesian(ylim = c(70, 100))
+    g = g + scale_fill_manual(name = "Legend", values=cols, breaks = names(cols))
+    g = g + scale_linetype_manual(name=" ", values = cols)
+    g = g + ggtitle("% of non-unique files")
+    g = g + theme(plot.title = element_text(hjust = 0.5))
+    ggsave(paste(outputFolder, "/", filename, sep = ""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
+    xxxyyyy <<- data
+    g
+}
+
+
+# aggregation helpers -------------------------------------------------------------------------------------------------
+
+is.true <- function (x) {
+    ! is.na(x) && x == T
+}
+
+sum <- function(from, npm = NA, tests = NA, minjs = NA, thUnique = NA, sccUnique = NA) {
+    result = rep(0L, length(from$time))
+    for (row in 1:length(from$time)) {
+        rowSum = 0L
+        for (col in 0:31) {
+            use = T
+            rc = as.raw(col)
+            if (is.true((as.integer(rc & as.raw(1)) != 0) == ! npm))
+                use = F;
+            if (is.true((as.integer(rc & as.raw(2)) != 0) == ! tests))
+                use = F;
+            if (is.true((as.integer(rc & as.raw(4)) != 0) == ! minjs))
+                use = F;
+            if (is.true((as.integer(rc & as.raw(8)) != 0) == ! thUnique))
+                use = F;
+            if (is.true((as.integer(rc & as.raw(16)) != 0) == ! sccUnique))
+                use = F;
+            if (use)
+                rowSum = rowSum + from[[2 + col]][[row]]
+        }
+        result[[row]] = rowSum
+    }
+    result
+    #data.frame(time = from$time, sums = result)
+}
+
+month.text = function(x) {
+    m = 3
+    y = 1999
+    m = m + x
+    while (m > 12) {
+        y = y + 1
+        m = m - 12
+    }
+    paste(m, y, sep = "/")
 }
 
 
@@ -469,12 +620,10 @@ exportHeatmapData <- function(dbName, outputFolder) {
 }
 
 exportAggregationData <- function(dbName, outputFolder) {
-    // fileId, cdate, npm, bower, test, minjs, thash
     sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = dbName, host = DB_HOST)
-    println("exporting projects_heat.csv")
-    sql.query("SELECT fileId, createdAt, npm, bower, test, minjs, tokenHashprojectId, stars, commits FROM projects INTO OUTFILE \"", outputFolder, "/projects_heat.csv\" FIELDS TERMINATED BY ','");
+    println("exporting files_statistics.csv")
+    sql.query("SELECT files.fileId, createdAt, npm, files.test, fileExt, tokenHash FROM files JOIN files_nm ON files.fileId = files_nm.fileId JOIN stats ON files.fileHash = stats.fileHash INTO OUTFILE \"", outputFolder, "/files_statistics.csv\" FIELDS TERMINATED BY ','");
     sql.disconnect();
-    
 }
 
 # when project level cloning is calculated, loads it in the database
