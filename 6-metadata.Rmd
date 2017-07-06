@@ -4,12 +4,10 @@ output: html_notebook
 ---
 
 ```{r setup, echo=F, results='hide'}
-library(RMySQL)
+Sys.setenv(R_NOTEBOOK_HOME = getwd())
 source("config.R")
 source("helpers.R")
 ```
-
-> This R notebook can be executed from within R, you can update the database connection properties and the dataset settings in the `config.R` file, or run the commands specified here interactively if you want to experiment. **Note that there are certain shell commands which the notebook itself will not execute.**
 
 Metadata from the paper come from two sources, one of them is the GitHub API, which we query about stars, users, etc. and the other one is number of commits per project, which we get from the `ghtorrent` snapshot. 
 
@@ -41,9 +39,12 @@ Note that for the paper, only the number of stars was used.
 
 The number of commits is obtained from GHTorrent's tables. Given the downloaded projects and the GHTorrent commits data (`projects_commits.csv`), we can run the `sccpreprocessor` to calculate the number of commits per project:
 
-    cd tools/sccpreprocessor/scc
-    java SccPreprocessor commits PATH_TO_DATASET PATH_TO_PROJECTS_COMMITS_GHTORRENT
-    cd ../../..
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools/sccpreprocessor/src
+java SccPreprocessor commits ../../../datasets/js ../../../ghtorrent/project_commits.csv
+```
+
 
 To import the data, use the `importCommits` function in `functions.R`:
 
@@ -55,6 +56,6 @@ Which adds the column `commits` to the projects table.
 
 ## Next Steps
 
-[Additional Processing](7-processing.Rmd) in file `7-processing.Rmd`.
+[Additional Processing](7-processing.nb.html) in file `[7-processing.Rmd`](7-processing.Rmd).
 
 

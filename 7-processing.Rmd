@@ -4,16 +4,12 @@ output: html_notebook
 ---
 
 ```{r setup, echo=F, results='hide'}
-library(RMySQL)
+Sys.setenv(R_NOTEBOOK_HOME = getwd())
 source("config.R")
 source("helpers.R")
 ```
 
-> This R notebook can be executed from within R, you can update the database connection properties and the dataset settings in the `config.R` file, or run the commands specified here interactively if you want to experiment. **Note that there are certain shell commands which the notebook itself will not execute.**
-
-# Heatmaps
-
-> This applies to all languages. 
+## Heatmap
 
 First a helper file that contains project ids, stars and commits must be exported from the database (`projects_heat.csv`):
 
@@ -21,12 +17,13 @@ First a helper file that contains project ids, stars and commits must be exporte
 exportHeatmapData(DATASET_NAME, DATASET_PATH);
 ```
 
-Then call the `sccpreprocessor` to calculate the heatmaps:
+Then call the `sccpreprocessor originals PATH_TO_DATASET NUM_CHUNKS` to calculate the heatmaps:
 
-    cd tools/sccpreprocessor/src
-    java SccPreprocessor originals PATH_TO_DATASET NUM_CHUNKS
-    cd ../../..
-    
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools/sccpreprocessor/src
+java SccPreprocessor originals ../../../datasets/js 1
+```    
 Where `NUM_CHUNKS` is number of chunks produced by the clone finder (i.e. how many threads the clone finder used). This produces `heatmap.csv`, which contains for each project a row with the following:
 
 - project id
@@ -35,11 +32,11 @@ Where `NUM_CHUNKS` is number of chunks produced by the clone finder (i.e. how ma
 - number of original files in the project
 - number of clones the project contains
 
-# JavaScript
-
 ## Tokenizer Extra Information
 
 JavaScript tokeizer produces extra information for its projects and files, stored in the `projects_extra.txt` and `files_extra.txt` files. When imported, these will add columns to the `projects` and `files` tables. The `importJSExtras` function in `functions.R` does this:
+
+>! TODO CHECK THIS WORKS!!!!!!
 
 ```{r}
 importJSExtras(DATASET_NAME, DATASET_PATH)
@@ -49,11 +46,12 @@ importJSExtras(DATASET_NAME, DATASET_PATH)
 
 For JavaScript, we also calculate kinds of files. Files can be `npm`, or `bower` files, tests, `min.js` files, locale files and other properties (file name w/o extension, npm package name, aand first npm package name (blame). To calculate this information, `sccpreprocessor` must be executed first to create `files_nm.csv`:
 
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools/sccpreprocessor/src
+java SccPreprocessor nm ../../../datasets/js
+```    
 
-    cd tools/sccpreprocessor/src
-    java SccPreprocessor nm ../../../datasets/js
-    cd ../../..
-    
 When done, the file can be imported into the database and a database with `_nonpm` suffix can be created, which would contain only non-npm files:    
     
 ```{r}
@@ -68,12 +66,8 @@ fileId, cdate, npm, bower, test, minjs, thash
 exportAggregationData(DATASET_NAME, DATASET_PATH)
 ```
 
-
-
-
-
 ## Next Steps
 
-[Project Clones](6-project-clones.Rmd) in file `6-project-clones.Rmd`.
+[Reporting](8-reporting.nb.html) in file [`8-reporting.Rmd`](8-reporting.Rmd).
 
     

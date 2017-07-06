@@ -4,7 +4,6 @@ output: html_notebook
 ---
 
 ```{r setup, echo=F, results='hide'}
-library(RMySQL)
 library(ggplot2)
 source("config.R")
 source("helpers.R")

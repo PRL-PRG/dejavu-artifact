@@ -4,7 +4,7 @@ output: html_notebook
 ---
 
 ```{r setup, echo=F, results='hide'}
-library(RMySQL)
+Sys.setenv(R_NOTEBOOK_HOME = getwd())
 library(ggplot2)
 source("config.R")
 source("helpers.R")
@@ -25,9 +25,11 @@ createHeatmap(DATASET_NAME, DATASET_PATH, "commits")
 
 For total, non-forked and unique URL project counts, run the scc preprocessor (replace the second argument with other language of your choice):
 
-    cd tools/sccpreprocessor/src
-    java SccPreprocessor stats ../../../ghtorrent/projects.csv JavaScript
-    cd ../../..
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools/sccpreprocessor/src
+java SccPreprocessor stats ../../../ghtorrent/projects.csv JavaScript
+```    
 
 The rest of data is provided in the following snippet:
 
@@ -231,3 +233,7 @@ f <- function() {
 }
 f()
 ```
+
+## Next Steps
+
+[Language specific reporting](9-reporting-other.nb.html) in file [`9-reporting-other.Rmd`](9-reporting-other.Rmd).

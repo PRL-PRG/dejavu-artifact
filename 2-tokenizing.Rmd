@@ -3,57 +3,62 @@ title: "2 - Downloading and Tokenizing the Projects"
 output: html_notebook
 ---
 
-The downloading and tokenization process differs from language to language, the following sections detail steps to be taken for each of the languages reported in the paper. 
-
-## JavaScript
+```{r setup, echo=F, results='hide'}
+Sys.setenv(R_NOTEBOOK_HOME = getwd())
+```
 
 Due to the sheer size of the JavaScript projects, the downloader tokenizes the files on the fly and deletes the projects as soon as they are tokenized. Furthermore, to save space, each unique token found in the file is assigned a unique id and these ids are used in the tokenized files (SourcererCC does not care about actual names of the tokens). The downloader & tokenizer produces extra files that allow it to map the token ids to the real tokens and counts their cummulative frequency all tokenized files.
 
 To speed up the download & tokenization process, the task can be distributed into strides and the outputs of the strides can then be merged to produce the final results. The following commands execute the provided projects in two strides:
 
-    tools/js-tokenizer/build/tokenizer JavaScript ghtorrent/projects.csv 2 0 downloads/js
-    tools/js-tokenizer/build/tokenizer JavaScript ghtorrent/projects.csv 2 1 downloads/js
+```{bash}
+cd $R_NOTEBOOK_HOME
+tools/js-tokenizer/build/tokenizer JavaScript ghtorrent/projects.csv 2 0 downloads/js quiet
+tools/js-tokenizer/build/tokenizer JavaScript ghtorrent/projects.csv 2 1 downloads/js quiet
+```
     
 > In production, the tokenizer and downloader are also parallelizable and can utilize multiple threads for its subtasks, however for the sake of running in the VM, the thread counts were limited to 1 per subtask. 
     
 When the strides are downloaded, the data must be merged using the ght tool:
 
-    tools/ght-pipeline/build/ght 0 1 downloads/js
-    
+```{bash}
+cd $R_NOTEBOOK_HOME
+tools/ght-pipeline/build/ght 0 1 downloads/js
+```
+
 And finally we can copy the merged results into the `datasets` folder:
 
-    mkdir -p datasets/js
-    cp downloads/js/files_0-1.csv datasets/js/files.csv
-    cp downloads/js/files_extra_0-1.csv datasets/js/files_extra.csv
-    cp downloads/js/projects_0-1.csv datasets/js/projects.csv
-    cp downloads/js/projects_extra_0-1.csv datasets/js/projects_extra.csv
-    cp downloads/js/stats_0-1.csv datasets/js/stats.csv
-    cp downloads/js/tokenized_files_0-1.csv datasets/js/tokenized_files.csv
-    cp downloads/js/tokens_text_0-1.csv datasets/js/tokens_text.csv
-    cp downloads/js/tokens_0-1.csv datasets/js/tokens.csv
+```{bash}
+cd $R_NOTEBOOK_HOME
+mkdir -p datasets/js
+# required for DB exports
+chmod -R 0777 datasets/js
+# copy the stuff
+cp downloads/js/files_0-1.csv datasets/js/files.csv
+cp downloads/js/files_extra_0-1.csv datasets/js/files_extra.csv
+cp downloads/js/projects_0-1.csv datasets/js/projects.csv
+cp downloads/js/projects_extra_0-1.csv datasets/js/projects_extra.csv
+cp downloads/js/stats_0-1.csv datasets/js/stats.csv
+cp downloads/js/tokenized_files_0-1.csv datasets/js/tokenized_files.csv
+cp downloads/js/tokens_text_0-1.csv datasets/js/tokens_text.csv
+cp downloads/js/tokens_0-1.csv datasets/js/tokens.csv
+```    
     
 A key aspect of the stride merger is that the `tokenized_files.csv` must be in ascending order of tokenized file ids, which is required by the SourcererCC in the next step. If you want, you can verify that it is indeed so by switching `ght-pipeline` into `sccsorter` branch, rebuilding and then running the following:
 
     tools/ght-pipeline/build/ght datasets/js/tokenized_files.csv
-    
+
 The tokenizer uses md5 for file and token hashes. As a first step before the data ingestion we convert the hashes into unique integers to make tables smaller and lookups faster:
 
-    cd tools/sccpreprocessor/src
-    java SccPreprocessor ../../../datasets/js 
-    cd ../../..
-    
-(where you can replace the dataset path for other languages as well). This creates new files `files.csv.h2i` and `stats.csv.h2i` where the hashes are replaced. 
-    
-    
-    
-## Extending the tool to other languages
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools/sccpreprocessor/src
+java SccPreprocessor h2i ../../../datasets/js 
+cd ../../..
+```    
 
-TODO
+This creates new files `files.csv.h2i` and `stats.csv.h2i` where the hashes are replaced. 
 
 ## Next Steps
 
-[SourcererCC Clone Analysis](3-sourcerercc.Rmd) in file `3-sourcerercc.Rmd`.
-
-
-
-
+[SourcererCC Clone Analysis](3-sourcerercc.nb.html) in file [`3-sourcerercc.Rmd`](3-sourcerercc.Rmd).

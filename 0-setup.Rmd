@@ -3,99 +3,131 @@ title: "0 - Setup & Tools"
 output: html_notebook
 ---
 
+
+```{r setup, echo=F, results='hide'}
+Sys.setenv(R_NOTEBOOK_HOME = getwd())
+```
+
+> Do not execute this notebook on the Virtual Machine during artifact evalation, all necessary tools have already been setup for you in advance.
+
 This notebook details the necessary setup & tools required to reproduce the paper results. Tools for all languages are described here. 
 
 ## Prerequisites
 
 `ant`, `curl`, `git`, `Java`, `Python`, `C++/C`, `cmake`, `R`, and `MySQL`/`MariaDB` are required to be able to reproduce the paper results. On linux machines, these can be easily installed using the system's package manager. Other operating systems might work too (e.g. WSL on Windows, or brew on OSX), but were not tested.
 
+## Creating `config.R`
+
+In order for the notebooks to work properly, a `config.R` file must be created in the folder where the notebooks reside. This file must specify the dataset names and paths, databse connection information, github API Tokens and so on, in the following format:
+
+```
+# basic database connection settings
+DB_HOST = "127.0.0.1"
+DB_USER = "<<your user>>"
+DB_PASSWORD = "<<your password>>"
+# dataset information
+DATASET_NAME = "js" # or language you wish to use
+DATASET_PATH = "/home/peta/devel/oopsla17-artifact/datasets/js" # this path must be absolute
+# github authentication tokens to circumvent github api limitations
+GITHUB_TOKENS = c("","","") 
+```
+
 ## Installing Tools
 
 All the tools will be installed into the `tools` folder, if the folder does not exist, create it and enter:
 
-    mkdir tools
-    cd tools
-    
+```{bash}
+cd $R_NOTEBOOK_HOME
+# cleanup
+rm -rf tools
+rm -rf graphs
+rm -rf datasets
+rm -rf downloads
+# prepare directories
+mkdir -p tools
+mkdir -p downloads/js
+```
+
 ### Sourcerer CC
 
-    git clone https://github.com/Mondego/SourcererCC.git
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools
+git clone https://github.com/Mondego/SourcererCC.git
+```    
 
 SourcererCC analyzes the similarity of given file inputs based on specified threshold. 
 
 ### Javascript Tokenizer
 
-    git clone https://github.com/reactorlabs/js-tokenizer.git
-    cd js-tokenizer
-    git checkout oopsla17
-    mkdir build
-    cd build
-    cmake ..
-    make
-    cd ../..
-    
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools
+git clone https://github.com/reactorlabs/js-tokenizer.git
+cd js-tokenizer
+git checkout oopsla17
+mkdir build
+cd build
+cmake ..
+make
+```    
 Due to sheer volume of the JavaScript projects, it was not feasible for us to keep the downloaded projects. The downloader therefore downloads the projects one by one, tokenizes the files within them and then deletes the projects, keeping only the tokenized files for later stages.  
-
-> TODO create a somewhat nicer oopsla branch... 
 
 ### GHT Pipeline
 
-    git clone https://github.com/reactorlabs/ght-pipeline.git                                                                                                        
-    cd ght-pipeline
-    mkdir build
-    cd build
-    git checkout stridemerger
-    cmake ..
-    make
-    cd ../..
-    
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools
+git clone https://github.com/reactorlabs/ght-pipeline.git                                                                                                        
+cd ght-pipeline
+mkdir build
+cd build
+git checkout stridemerger
+cmake ..
+make
+```
+
 Because the downloader uses multiple passes, the results of it must be merged together into single files. The `ght` tool does exactly that. 
 
 ### SCC preprocessor
 
-    git clone https://github.com/reactorlabs/sccpreprocessor.git                                                                                                     
-    cd sccpreprocessor/src
-    javac *.java
-    cd ../..
-    
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools
+git clone https://github.com/reactorlabs/sccpreprocessor.git                                                                                                     
+cd sccpreprocessor/src
+javac *.java
+```
+
 Various simple data analyses are implemented in the SCC preprocessor (such as NPM files detection, test files detection, etc.). 
 
 ### Clone Finder
 
-    git clone https://github.com/reactorlabs/clone_finder.git    
-    cd clone_finder
-    mkdir build
-    cd build
-    cmake ..
-    make
-    cd ../..
-    
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools
+git clone https://github.com/reactorlabs/clone_finder.git    
+cd clone_finder
+mkdir build
+cd build
+cmake ..
+make
+```
+
 Clone finder analyses the project-level cloning among the downloader projects.
 
 > Currently this clone finder is used only for JavaScript, but it should be completely compatible with other languages as well. Unlike the python version, works from csv files and does all computations in memory.
 
     
-### Js-reports
-
-    git clone https://github.com/reactorlabs/js-reports.git    
-    
-> TODO I should move this to different one of the above tools for simplicty, if it used AT ALL
-
-
 ## Other Considerations
 
-- make sure that the dataset folders are writeable by any user (MySQL will export files there)
-- install the following packages in R `RCurl`, `RMySQL`, `rjson`, `bitops`, `ggplot2`.
+Install required R packages:
 
-    
+```{r}
+install.packages(c("RCurl", "RMySQL", "rjson", "bitops", "ggplot2"))
+```
+
 ## Next Steps
 
-When all tools are installed, do not forget to return to the default directory for other steps to work:
-
-    cd ..
-    
-Then follow to next step, which is [Getting Github project Urls](1-getting-projects.Rmd) in file `1-getting-projects.Rmd`.
-
-
-
-
+[Getting Github project Urls](1-getting-projects.nb.html) in file [`1-getting-projects.Rmd`](1-getting-projects.Rmd).
 

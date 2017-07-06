@@ -1,30 +1,21 @@
 ---
-title: "DejaVu Paper Artifact "
+title: "Javascript Pipeline"
 output: html_notebook
 ---
 
-This notebook presents the artifact for the DejaVu paper. The paper discusses cloning on both file and project levels among github repositories for 4 languages (C++, Java, Python and JavaScript). Due to the sheer volume of data and computational analysis required to reproduce the results of the paper, it might not be possible to evaluate all claims of the paper within the short period allowed for the evaluation. Therefore the artifact comes in different flavours:
+The entire JavaScript pipeline is outlined in this readme file with links to detailed descriptions of respective sections. The workflow assumes that all commands are executed from the directory where the notebooks are stored so that the notebooks can be executed from within R studio. You can either follow them snippet by snippet (a single snippet can be executed by pressing `CTRL`+`SHIFT`+`ENTER`), or you can execute entire notebooks at noce (Using the `Run` command).
 
-- R notebooks that describe all the necessary steps to reproduce the results in the paper in their entirety, from obtaining data from the Ghtorrent, to various preprocessing steps and to population of a database and various output files used in the reporting stage
-- R notebook that takes the outputs from the above step and produces the graphs & tables presented in the paper
-- a VM containing the above with a randomly sampled very small subset of the github repositories, so that artifact reviewers can verify that all the scripts in the steps above work properly on reasonable hardware and in limited time
-- a ssh access (TODO how can we anonymize this?) to a machine that contains all the outputs of step 1 for the entire dataset in the paper, so that reviewers can check the paper claims computation on the entire dataset
+For more information about R notebooks in R Studio, see [R Notebooks in R Studio](http://rmarkdown.rstudio.com/r_notebooks.html).
 
-> TODO the paper is shepherded and entire github has been asked for the languages. This will be done, but perhaps not in time for the artifact deadline.
-
-The following sections provide an outline of the steps required to reproduce the entire results of the paper and provide links to detailed description of the phases. The detailed description will, where appropriate, also describe the differences between different languages (e.g. different tokenizers, etc.).
-
-> TODO add a section on how to follow the notebooks and their execution
-
-Note that to check the pipeline in the provided VM, steps 0 and 1 must be skipped. All steps but the 8th have already been carried out on the machine to which remote access is provided. 
+Note that the notebooks and their snippets must be executed in order, and that not all notebooks should be executed in all contexts, i.e. when running in the VM, setup (step 1) and Getting github project URLs (step 2) were aready executed and when accessing the entire dataset on server, only reporting (steps 8 and 9) can be ran. 
 
 ## 0 - Setup & Tools
 
-> This step is not necessary for the VM as the tools have already been installed & setup. It is worth reading though as descriptions of the various tools used is provided here.
+*This step has already been executed on the VM*
 
 An overview of the required tools and their setup. 
 
-[Detailed Information](0-setup.Rmd) can be found in file `0-setup.Rmd`.
+[Detailed Information](0-setup.nb.html) can be found in file `0-setup.Rmd`.
 
 ## 1 - Getting Github project urls
 
@@ -32,43 +23,43 @@ An overview of the required tools and their setup.
 
 In this step, GHTorrent database snapshot is used to filter out list of available project urls on github, forks, deleted and duplicated projects are excluded. 
 
-[Detailed Information](1-getting-projects.Rmd) can be found in file `1-getting-projects.Rmd`.
+[Detailed Information](1-getting-projects.nb.html) can be found in file `1-getting-projects.Rmd`.
 
 ## 2 - Downloading and tokenizing the projects
 
 This step details the download & tokenization techniques for the filtered projects. After this step the file & token hashes for all files are known. 
 
-[Detailed Information](2-tokenizing.Rmd) in file `2-tokenizing.Rmd`.
+[Detailed Information](2-tokenizing.nb.html) in file `2-tokenizing.Rmd`.
 
 ## 3 - SourcererCC Clone Analysis
 
 Tokenized files are fed into the SourcererCC and similar files are found. 
 
-[Detailed Information](3-sourcerercc.Rmd) in file `3-sourcerercc.Rmd`.
+[Detailed Information](3-sourcerercc.nb.html) in file `3-sourcerercc.Rmd`.
 
 ## 4 - Database Import
 
 The computed data is loaded into a MySQL database
 
-[Detailed Information](4-dbimport.Rmd) in file `4-dbimport.Rmd`.
+[Detailed Information](4-dbimport.nb.html) in file `4-dbimport.Rmd`.
 
 ## 5 - Project Clones
 
 Clone information for entire projects is calculated (this is the input data for the heatmaps). 
 
-[Detailed Information](5-project-clones.Rmd) in file `5-project-clones.Rmd`.
+[Detailed Information](5-project-clones.nb.html) in file `5-project-clones.Rmd`.
 
 ## 6 - Metadata Acquisition
 
 Dowloads metadata for the projects directy from github, or from the ghtorrent snapshot.
 
-[Detailed Information](6-metadata.Rmd) in file `6-metadata.Rmd`.
+[Detailed Information](6-metadata.nb.html) in file `6-metadata.Rmd`.
 
 ## 7 - Additional Processing
 
 Additional processing (different for different languages), using both the files and the database.
 
-[Detailed Information](7-processing.Rmd) in file `7-processing.Rmd`.
+[Detailed Information](7-processing.nb.html) in file `7-processing.Rmd`.
 
 
 ## 8 - Data Analysis & Reporting
@@ -77,5 +68,10 @@ Additional processing (different for different languages), using both the files 
 
 These steps produces the graphs and tables in the paper. 
 
-[Detailed Information](8-reports.Rmd) in file `8-reports.Rmd`.
+[Detailed Information](8-reports.nb.html) in file `8-reports.Rmd`.
+
+
+## 9 - Language specific reporting
+
+[Detailed Information](9-reporting-other.nb.html) in file [`9-reporting-other.Rmd`](9-reporting-other.Rmd).
 

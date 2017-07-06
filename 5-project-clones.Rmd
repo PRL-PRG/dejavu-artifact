@@ -4,12 +4,10 @@ output: html_notebook
 ---
 
 ```{r setup, echo=F, results='hide'}
-library(RMySQL)
+Sys.setenv(R_NOTEBOOK_HOME = getwd())
 source("config.R")
 source("helpers.R")
 ```
-
-> This R notebook can be executed from within R, you can update the database connection properties and the dataset settings in the `config.R` file, or run the commands specified here interactively if you want to experiment. **Note that there are certain shell commands which the notebook itself will not execute.**
 
 First, the input data for `clone_finder` must be exported:
 
@@ -17,9 +15,12 @@ First, the input data for `clone_finder` must be exported:
 exportCloneFinderData(DATASET_NAME, DATASET_PATH)
 ```
 
-Once done, you may run the `clone_finder`:
+Once done, you may run the `clone_finder NUM_THREADS FOLDER THRESHOLD`:
 
-     tools/clone_finder/build/clone_finder NUM_THREADS FOLDER THRESHOLD
+```{bash}
+cd $R_NOTEBOOK_HOME
+tools/clone_finder/build/clone_finder 1 datasets/js 2
+```
      
 Where `NUM_THREADS` is the number of threads the clone finder may use, `FOLDER` is the dataset folder and `THRESHOLD` is the minimal inclusive number of tokens the files must have to be considered. To proceed without modifications, set the number of threads to `1`. 
 
@@ -33,4 +34,4 @@ Where the last argument is number of threads the `clone_finder` used and must th
 
 ## Next Steps
 
-[Metadata Acquisition](6-metadata.Rmd) in file `6-metadata.Rmd`.
+[Metadata Acquisition](6-metadata.nb.html) in file [`6-metadata.Rmd`](6-metadata.Rmd).

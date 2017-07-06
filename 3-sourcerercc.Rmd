@@ -3,23 +3,33 @@ title: "3 - SourcererCC Clone Analysis"
 output: html_notebook
 ---
 
+```{r setup, echo=F, results='hide'}
+Sys.setenv(R_NOTEBOOK_HOME = getwd())
+```
+
+
 First, copy the tokenized files into a location where SourcererCC will look for its input (`input/dataset/blocks.file`):
 
-    cd tools/SourcererCC/clone_detector
-    cp ../../../datasets/js/tokenized_files.csv input/dataset/blocks.file
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools/SourcererCC/clone_detector
+cp ../../../datasets/js/tokenized_files.csv input/dataset/blocks.file
+```
     
 Then, run SourcererCC by invoking the controller:
 
-    python controller.py
+```{bash}
+cd $R_NOTEBOOK_HOME
+python controller.py
+```
     
 SourcererCC runs distributed across multiple nodes and when finished, the result from the nodes must be joined together into a `sourcerer.csv` file in the dataset. Assuming 2 nodes were used, the following command should be executed:
 
-    cat NODE_*/output8.0/query_* > ../../../datasets/js/sourcerer.csv
+```{bash}
+cd $R_NOTEBOOK_HOME
+cat NODE_*/output8.0/query_* > ../../../datasets/js/sourcerer.csv
+```
     
-When done, return back to root directory:
-
-    cd ../../..
-
 ## Next Steps
 
-[Database Import](4-dbimport.Rmd) in file `4-dbimport.Rmd`.
+[Database Import](4-dbimport.nb.html) in file [`4-dbimport.Rmd`](4-dbimport.Rmd).
