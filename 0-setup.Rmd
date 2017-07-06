@@ -10,11 +10,21 @@ Sys.setenv(R_NOTEBOOK_HOME = getwd())
 
 > Do not execute this notebook on the Virtual Machine during artifact evalation, all necessary tools have already been setup for you in advance.
 
-This notebook details the necessary setup & tools required to reproduce the paper results. Tools for all languages are described here. 
+This notebook details the necessary setup & tools required to reproduce the paper results.
 
 ## Prerequisites
 
 `ant`, `curl`, `git`, `Java`, `Python`, `C++/C`, `cmake`, `R`, and `MySQL`/`MariaDB` are required to be able to reproduce the paper results. On linux machines, these can be easily installed using the system's package manager. Other operating systems might work too (e.g. WSL on Windows, or brew on OSX), but were not tested.
+
+MySQL or MariaDB must not use `secure_file_priv` (disable by setting it to `""` in the configuration file) and the db user must have rights to access the dataset folders (this may require changing settings in apparmor or SELinux depending on distrbution). 
+
+For running the `Rmd` files, we also require RStudio installed. 
+
+Install required R packages:
+
+```{r}
+install.packages(c("RCurl", "RMySQL", "rjson", "bitops", "ggplot2"))
+```
 
 ## Creating `config.R`
 
@@ -116,14 +126,6 @@ make
 ```
 
 Clone finder analyses the project-level cloning among the downloader projects.
-
-## Other Considerations
-
-Install required R packages:
-
-```{r}
-install.packages(c("RCurl", "RMySQL", "rjson", "bitops", "ggplot2"))
-```
 
 ## Next Steps
 

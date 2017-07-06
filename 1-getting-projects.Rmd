@@ -23,6 +23,8 @@ mv mysql-2017-01-19/project_commits.csv project_commits.csv
 rm -rf mysql-2017-01-19
 cd ..
 ```    
+
+> Note that getting the entire ghtorrent and extracting the files may take a lot of time, depending on the connection speed. 
     
 Note that the exact paths will differ based on the exact mysql snapshot used, but at the end of this step you should have the files `ghtorrent/projects.csv` and `ghtorrent/project_commits.csv` ready.
 
