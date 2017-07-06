@@ -23,13 +23,18 @@ createHeatmap(DATASET_NAME, DATASET_PATH, "commits")
 
 ## Table 1 - Corpus
 
+For total, non-forked and unique URL project counts, run the scc preprocessor (replace the second argument with other language of your choice):
+
+    cd tools/sccpreprocessor/src
+    java SccPreprocessor stats ../../../ghtorrent/projects.csv JavaScript
+    cd ../../..
+
+The rest of data is provided in the following snippet:
+
 ```{r}
 f <- function() {
     sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = DATASET_NAME, host = DB_HOST)
     println("Counts:")
-    println("  Projects (total)         ")
-    println("  Projects (non-fork)      ")
-    println("  URLs processed           ")
     println("  Projects downloaded      ", sql.query("SELECT COUNT(*) FROM projects"))
     println("  Projects analyzed        ", sql.query("SELECT COUNT(*) FROM projects WHERE files > 0"))
     println("  Files analyzed           ", sql.query("SELECT COUNT(*) FROM files"))
@@ -64,7 +69,7 @@ f()
 
 ## Fig 3 - File Level Duplication
 
-> Done in EXCEL
+This graph has been created in Excel from the data in Table 2 above.
 
 ## Table 3 - File Level Duplication Excluding Small Files
 
@@ -87,7 +92,7 @@ f()
 
 ## Fig 4 - File Level Duplication Excluding Small Files
 
-> Done in EXCEL
+This graph has been created in Excel from the data in Table 3 above.
 
 ## Table 4 - Inter Project Cloning
 
@@ -107,7 +112,7 @@ f()
 
 ## Fig 5 - Percentage of project clones at various levels of overlap.
 
-> Done in EXCEL
+This graph has been created in Excel from the data in table 4 above.
 
 ## Table 5 -  Number of tokens per file within certain percentiles of the distribution of file size.
 
