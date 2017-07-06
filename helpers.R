@@ -332,7 +332,7 @@ nonNpmFilesOverTime = function(outputFolder, js_aggregate, filename) {
     g
 }
 
-nonUniqueFilesOverTime = function(outputFolder, js_aggregate, filename) {
+nonUniqueFilesOverTime = function(outputFolder, js_aggregate, filename, bounds = c(70, 100)) {
     cols <- c(
         "# of all files"="#c0c0c0",
         "# of NPM files"="#a0a0a0",
@@ -346,22 +346,22 @@ nonUniqueFilesOverTime = function(outputFolder, js_aggregate, filename) {
     minx = min(x)
     data = data.frame(
         time = js_aggregate$time,
-        all = sum(js_aggregate) * 30 / maxx,
-        npm = sum(js_aggregate, npm = T) * 30 / maxx,
+        all = sum(js_aggregate) * (bounds[[2]] - bounds[[1]]) / maxx,
+        npm = sum(js_aggregate, npm = T) * (bounds[[2]] - bounds[[1]]) / maxx,
         pctAll = 100 - sum(js_aggregate, thUnique = T) * 100 / sum(js_aggregate),
         pctNPM = 100 - sum(js_aggregate, npm = T, thUnique = T) * 100 / sum(js_aggregate,npm = T),
         pctNonNPM = 100 - sum(js_aggregate, npm = F, thUnique = T) * 100 / sum(js_aggregate, npm = F),
         pctNonNPMTest = 100 - sum(js_aggregate, npm = F, tests = T, thUnique = T) * 100 / sum(js_aggregate, npm = F, tests = T))
     g = ggplot(data, aes(x = time))
-    g = g + geom_area(aes(y = all, fill = "# of all files"), position = position_nudge(y = 70))
-    g = g + geom_area(aes(y = npm, fill = "# of NPM files"), position = position_nudge(y = 70))
+    g = g + geom_area(aes(y = all, fill = "# of all files"), position = position_nudge(y = bounds[[1]]))
+    g = g + geom_area(aes(y = npm, fill = "# of NPM files"), position = position_nudge(y = bounds[[1]]))
     g = g + geom_line(aes(y = pctAll, linetype = "all files"))
     g = g + geom_line(aes(y = pctNPM, linetype = "NPM"))
     g = g + geom_line(aes(y = pctNonNPM, linetype = "non-NPM"))
     g = g + geom_line(aes(y = pctNonNPMTest, linetype = "non-NPM tests"))
     g = g + scale_x_continuous("Date", limits = c(109, 212), labels = function(x) sapply(x, month.text), breaks = c(106,118, 130, 142, 154, 166, 178, 190, 202, 212))
     g = g + scale_y_continuous("%", labels = plain)
-    g = g + coord_cartesian(ylim = c(70, 100))
+    g = g + coord_cartesian(ylim = bounds)
     g = g + scale_fill_manual(name = "Legend", values=cols, breaks = names(cols))
     g = g + scale_linetype_manual(name=" ", values = cols)
     g = g + ggtitle("% of non-unique files")

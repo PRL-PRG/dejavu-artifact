@@ -28,7 +28,7 @@ nonNpmFilesOverTime(DATASET_PATH, js_aggregate, paste("time_",DATASET_NAME,"_fil
 ## Fig 7 -  Percentage of clones over time
 
 ```{r}
-nonUniqueFilesOverTime(DATASET_PATH, js_aggregate, paste("time_", DATASET_NAME, "_dup_bw.pdf", sep = ""))
+nonUniqueFilesOverTime(DATASET_PATH, js_aggregate, paste("time_", DATASET_NAME, "_dup_bw.pdf", sep = ""), bounds = c(0, 100))
 ```
 
 
