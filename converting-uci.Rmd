@@ -1,0 +1,207 @@
+---
+title: "Converting UCI datasets to JS format"
+output: html_notebook
+---
+
+```{r setup, echo=F, results='hide'}
+Sys.setenv(R_NOTEBOOK_HOME = getwd())
+source("config.R")
+source("helpers.R")
+```
+
+## Settings
+
+```{r}
+CPP_PATH = "/home/peta/cpp"
+CPP_DB = "cpp"
+JAVA_PATH = "/home/peta/java"
+JAVA_DB = "java"
+PYTHON_PATH = "/home/peta/python"
+PYTHON_DB = "python"
+Sys.setenv(CPP_PATH = CPP_PATH)
+Sys.setenv(JAVA_PATH = JAVA_PATH)
+Sys.setenv(PYTHON_PATH = PYTHON_PATH)
+```
+
+## Import into database 
+
+> Note: you do not need to do this step if the data is already in database. 
+
+The following imports the data to the database from CSV files obtained by pedro. They are not really comma separated and have slightly different layout:
+
+```{r}
+f <- function(dbname, path) {
+    sql.connect(dbname = dbname)
+    sql.query("CREATE TABLE projects (
+        projectId INT UNSIGNED NOT NULL,
+        projectPath VARCHAR(4000) NOT NULL,
+        projectUrl VARCHAR(4000) NOT NULL,
+        PRIMARY KEY (projectId))")
+    sql.query("    CREATE TABLE files (
+        fileId BIGINT UNSIGNED NOT NULL,
+        projectId INT UNSIGNED NOT NULL,
+        relativeUrl VARCHAR(4000) NOT NULL,
+        fileHash CHAR(32) NOT NULL,
+        PRIMARY KEY (fileId))")
+    sql.query("CREATE TABLE stats (
+        fileHash CHAR(32) NOT NULL,
+        fileBytes INT NOT NULL,
+        fileLines INT NOT NULL,
+        fileLOC INT NOT NULL,
+        fileSLOC INT NOT NULL,
+        totalTokens INT NOT NULL,
+        uniqueTokens INT NOT NULL,
+        tokenHash CHAR(32) NOT NULL,
+        PRIMARY KEY (fileHash))")
+    sql.query("CREATE TABLE projectClones (
+        id BIGINT NOT NULL,
+        cloneId INT UNSIGNED NOT NULL,
+        cloneClonedFiles INT UNSIGNED NOT NULL,
+        cloneTotalFiles INT UNSIGNED NOT NULL,
+        cloneCloningPercent DECIMAL(6,3) NOT NULL,
+        hostId INT UNSIGNED NOT NULL,
+        hostAffectedFiles INT UNSIGNED NOT NULL,
+        hostTotalFiles INT UNSIGNED NOT NULL,
+        hostAffectedPercent DECIMAL(6,3) NOT NULL,
+        PRIMARY KEY (cloneId, hostId))")
+    sql.query("LOAD DATA INFILE '",path,"/files.txt' INTO TABLE files FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 LINES")
+    sql.query("LOAD DATA INFILE '",path,"/stats.txt' INTO TABLE stats FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 LINES")
+    sql.query("LOAD DATA INFILE '",path,"/projects.txt' INTO TABLE projects FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 LINES")
+    sql.query("LOAD DATA INFILE '",path,"/projectClones.txt' INTO TABLE projectClones FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 LINES")
+    sql.disconnect()
+}
+f(CPP_DB, CPP_PATH)
+f(JAVA_DB, JAVA_PATH)
+f(PYTHON_DB, PYTHON_PATH)
+```
+
+## Replacing hash strings with unique integers
+
+First export the database tables in csv format:
+
+```{r}
+f <- function(dbname, path) {
+    sql.connect(dbname = dbname)
+    sql.query("SELECT * FROM files INTO OUTFILE '",path,"/files.csv' FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'")
+    sql.query("SELECT * FROM stats INTO OUTFILE '",path,"/stats.csv' FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'")
+    sql.disconnect()
+}
+f(CPP_DB, CPP_PATH)
+f(JAVA_DB, JAVA_PATH)
+f(PYTHON_DB, PYTHON_PATH)
+```
+
+Then run sccpreprocessor to create the `h2i` versions:
+
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools/sccpreprocessor/src
+java SccPreprocessor h2i $CPP_PATH
+java SccPreprocessor h2i $JAVA_PATH
+java SccPreprocessor h2i $PYTHON_PATH
+```    
+
+Finally, drop the old tables and ingest the new data into the db:
+
+```{r}
+f <- function(dbname, path) {
+    sql.connect(dbname = dbname)
+    sql.query("DROP TABLE files")
+    sql.query("DROP TABLE stats")
+    sql.query("CREATE TABLE files (
+        fileId BIGINT UNSIGNED NOT NULL,
+        projectId INT UNSIGNED NOT NULL,
+        relativeUrl VARCHAR(4000) NOT NULL,
+        fileHash BIGINT NOT NULL,
+        PRIMARY KEY (fileId))")
+    sql.query("CREATE TABLE stats (
+        fileHash BIGINT NOT NULL,
+        fileBytes INT NOT NULL,
+        fileLines INT NOT NULL,
+        fileLOC INT NOT NULL,
+        fileSLOC INT NOT NULL,
+        totalTokens INT NOT NULL,
+        uniqueTokens INT NOT NULL,
+        tokenHash BIGINT NOT NULL,
+        PRIMARY KEY (fileHash))")
+    sql.query("LOAD DATA INFILE '", path, "/files.csv.h2i' INTO TABLE files FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'")
+    sql.query("LOAD DATA INFILE '", path, "/stats.csv.h2i' INTO TABLE stats FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'")
+    sql.disconnect()
+}
+f(CPP_DB, CPP_PATH)
+f(JAVA_DB, JAVA_PATH)
+f(PYTHON_DB, PYTHON_PATH)
+```
+
+## Fixing the projectClones layout
+
+```{r}
+f <- function(dbname, path) {
+    sql.connect(dbname = dbname)
+    sql.query("ALTER TABLE projectClones DROP COLUMN id")
+    sql.disconnect()
+}
+f(CPP_DB, CPP_PATH)
+f(JAVA_DB, JAVA_PATH)
+f(PYTHON_DB, PYTHON_PATH)
+```
+
+## importing the metadata
+
+> How are metadata produced in the VM artifact????
+
+First add the columns, then create the metadata table, then update projects table and finally drop the metadata table:
+
+    ALTER TABLE projects ADD COLUMN stars INT NOT NULL DEFAULT 0;
+    ALTER TABLE projects ADD COLUMN commits INT NOT NULL DEFAULT 0;
+    CREATE TABLE metadata (
+        xxx BIGINT UNSIGNED NOT NULL,
+        projectId BIGINT UNSIGNED NOT NULL,
+        commits INT NOT NULL,
+        stars INT NOT NULL,
+        PRIMARY KEY(projectId)
+    );
+    LOAD DATA INFILE '/home/peta/python/metadata.csv' INTO TABLE metadata FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+    UPDATE projects JOIN metadata ON projects.projectId = metadata.projectId SET projects.stars = metadata.stars, projects.commits = metadata.commits;
+    DROP TABLE metadata;
+    
+## Exporting data for heatmap
+
+Export the `projects_heat.csv` and `project_clones.0.csv` required for the sccpreprocessor:
+
+```{r}
+f <- function(dbname, path) {
+    sql.connect(dbname = dbname)
+    sql.query("SELECT projectId, stars, commits FROM projects INTO OUTFILE '", path, "/projects_heat.csv' FIELDS TERMINATED BY ','")
+    sql.query("SELECT * FROM projectClones INTO OUTFILE '", path, "/project_clones.0.csv' FIELDS TERMINATED BY ','")
+    sql.disconnect()
+}
+f(CPP_DB, CPP_PATH)
+f(JAVA_DB, JAVA_PATH)
+f(PYTHON_DB, PYTHON_PATH)
+```
+
+Then run sccpreprocessor
+
+```{bash}
+cd $R_NOTEBOOK_HOME
+cd tools/sccpreprocessor/src
+java SccPreprocessor originals $CPP_PATH 1
+java SccPreprocessor originals $JAVA_PATH 1
+java SccPreprocessor originals $PYTHON_PATH 1
+```    
+
+
+
+
+```{r}
+f <- function(dbname, path) {
+    sql.connect(dbname = dbname)
+    sql.query("")
+    sql.query("")
+    sql.disconnect()
+}
+f(CPP_DB, CPP_PATH)
+f(JAVA_DB, JAVA_PATH)
+f(PYTHON_DB, PYTHON_PATH)
+```
