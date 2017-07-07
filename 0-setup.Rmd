@@ -89,7 +89,7 @@ Due to sheer volume of the JavaScript projects, it was not feasible for us to ke
 ```{bash}
 cd $R_NOTEBOOK_HOME
 cd tools
-git clone https://github.com/reactorlabs/ght-pipeline.git                                                                                                        
+git clone https://github.com/reactorlabs/ght-pipeline.git
 cd ght-pipeline
 mkdir build
 cd build
@@ -105,7 +105,7 @@ Because the downloader uses multiple passes, the results of it must be merged to
 ```{bash}
 cd $R_NOTEBOOK_HOME
 cd tools
-git clone https://github.com/reactorlabs/sccpreprocessor.git                                                                                                     
+git clone https://github.com/reactorlabs/sccpreprocessor.git
 cd sccpreprocessor/src
 javac *.java
 ```

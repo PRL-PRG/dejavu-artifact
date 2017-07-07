@@ -7,7 +7,11 @@ The entire JavaScript pipeline is outlined in this readme file with links to det
 
 For more information about R notebooks in R Studio, see [R Notebooks in R Studio](http://rmarkdown.rstudio.com/r_notebooks.html).
 
-Note that the notebooks and their snippets must be executed in order, and that not all notebooks should be executed in all contexts, i.e. when running in the VM, setup (steps 0 and 1) and Getting github project URLs (step 2) were aready executed and when accessing the entire dataset on server, only reporting (steps 8 and 9) should be executed there, but will take a lot of time (hours) to finish.  
+What to do:
+
+- if you are evaluation the VM artifact, skip steps 0 and 1 as they were already executed (using the dataset sample) and jump immediately to step 2.  
+- if you are evaluating on the entire dataset on our server using the datasets provided there, you can only execute steps 8 and 9. 
+- if you want to reproduce the entire pipeline, start with step 0. *Note that redoing the entire pipeline on entire github will take weeks*.
 
 When time estimates are provided in the steps they usually concern the VM running time on the dataset sample. Running time on full dataset is in days and weeks. 
 
