@@ -1,0 +1,45 @@
+---
+title: "DejaVu Artifact Description"
+output: html_notebook
+---
+
+This readme describes the artifact for the DejaVu OOPSLA 2017 paper. The paper provides a large scale study of code duplication in four languages (C++, Java, Python and JavaScript) on large github datasets. Due to the sheer volume of the data, it is not feasible to reproduce & validate all claims of the paper in the time allowed forartifact evaluation. We therefore provide three distinct versions of the artifact, which are decribed in detail in the following sections:
+
+- a virtual machine where reviewers can validate all steps of the data processing & analysis on a extremely small subset of input data in reasonable time
+- access to our machine where the entire dataset is already processed so that the reviwers can verify the claims of the paper based on the dataset
+- detailed description of how to execute the entire analysis again on large data, perhaps for different languages, or with different sources for the projects to facilitate further research
+
+We would like to thank reviwers for their time spent with the artifact and for the comments they may have on the usability of the artifact. 
+
+## Virtual Machine
+
+We provide a VirtualBox virtual machine that has preinstalled a very small subset of the data and all the required tools to do all steps required to produce the results of the paper. Completing all steps in the virtual machine should take an hour or two, depending on your internet connection. Please note that while the machine reproduces all steps done for the paper, the resulting graphs would look very different on the extremely limited subset of the real data. 
+
+The machine can be downloaded from the following address:
+
+    I do not want to put this on GH
+    
+> Perhaps the link should be anonymized and we can use dropbox or google drive, or whatever, Pedro?
+
+When downloaded, run [VirtualBox](http://virtualbox.org) and then select `File`->`Import Appliance`, then start the VM. For the login prompt, keep user as `oopsla` and type the password `p`. In the top left corner, there is a `START HERE.txt` file that contains information on how to reproduce the results in the virtual machine. 
+
+## Access to Entire Dataset
+
+Reviewers are encouraged to explore the entire datasets for all four languages reported in the paper. Due to very large size of the computed data and prohibitively long computation time, we provide the full dataset in the form of an access to our machine, where the entire dataset available. 
+
+To make sure that the reviwers will not interfere with each other, we have created four user accounts for the reviewers and will be happy to create more, if requested. We kindly ask the reviewers to distribute these accounts between themselves so that each reviwer uses unique account. The accounts are:
+
+- username `oopsla1`, password `I do not want to put this on GH`
+- username `oopsla2`, password `I do not want to put this on GH`
+- username `oopsla3`, password `I do not want to put this on GH`
+- username `oopsla4`, password `I do not want to put this on GH`
+
+(feel free to change the passwords for your respective accounts, as long as these remain secure)
+
+The machine name is: `I do not want to put this on GH`.
+
+Upon logging to the machine, please look at the `~/pipeline/readme-full-dataset.Rmd` for detailed instructions on how to reproduce the results.
+
+## R Notebooks with detailed instructions on how to reproduce all steps
+
+The R notebooks in the virtual machine also provide enough information so that they can be executed on any other machine (Linux based) and on the full (or updated dataset). We also provide hints on how to update the tool to produce the same analysis for different languages. 

@@ -1,0 +1,28 @@
+---
+title: "Entire Dataset"
+output: html_notebook
+---
+
+This machine contains the entire datasets presented in the paper for all four languages so that you can inspect the entire data we report. Read access to the database is provided for user `oopsla` with password `vancouver`, i.e. you can connect from commandline using the following command:
+
+    mysql -u oopsla -p
+    
+and then typing the password `vancouver` in the command prompt. 
+
+## Database Layout
+
+Each language has its own database, i.e. `cpp` for C++, `java` for Java, `python` for Python and `jsHalf` for JavaScript. You can also find the CSV files the respective subdirectories of the `~/datasets` folder of your username. 
+
+All datasets contain at least the basic tables & columns required for the graphs, but certain languages may provide extra tables, columns or csv files. Consult the paper and the artifact pipelines in the VM for more details. 
+
+## Producing the graphs
+
+Calculating all the graphs for the entire datasets is very time consuming process (hours) so we do not provide an executable notebook. Instead we recommend you use `Rscript` to run the `allGraphs()` function in `helpers.R` file that would calculate all graphs for all languages and output them in `~/graphs/LANGUAGE` where `LANGUAGE` is `cpp`, `java`, `python`, `jsHalf`. We also recommend that you use `tmux` so that you do not have to be connected to the machine for the entire duration of the task, i.e:
+
+    tmux
+    cd ~/pipeline
+    Rscript -e "source('config.R'); source('helpers.R'); allGraphs('/home/oopsla/datasets', c('cpp','java','python','jsHalf'), '/home/oopsla/graphs');"
+    
+This will take hours to finish, but you can close the connection. When you connect to `ginger` again to check the progress simply type:
+
+    tmux attach

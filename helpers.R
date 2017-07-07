@@ -77,8 +77,6 @@ createHeatmap <- function(datasetName, datasetPath, y_axis = "commits") {
     g
 }
 
-
-
 # graphs --------------------------------------------------------------------------------------------------------------
 
 logHistogram <- function(dbname, query, title, xtitle, ytitle, filename = NULL) {
@@ -858,5 +856,30 @@ sql.switchDb <- function(dbName) {
             stop(e)
         }
     })
+}
+
+# wrapper function for creating all graphs shown in the paper ---------------------------------------------------------
+# Rscript -e "source('config.R'); source('helpers.R'); println('hello');"
+allGraphs <- function(pathRoot, datasets, outputDir) {
+    datasetPaths = paste(pathRoot, datasets, sep = "/")
+    outputDirs = paste(outputDir, datasets, sep = "/")
+    println("creating output directories")
+#    for ()
+    for (dname in datasets) {
+        #odir = 
+    }
+        
+    println("creating heatmaps...")
+    for (dname in datasets) {
+        path = paste(datasetsPath)
+        
+    }
+    heatmap = read.csv(paste(DATASET_PATH, "/heatmap.csv", sep=""), header = F, col.names = c("pid", "stars", "commits", "files", "originalFiles","containsClones"))
+    createHeatmap(DATASET_NAME, DATASET_PATH, "commits")
+    
+    
+    
+    
+    
 }
 
