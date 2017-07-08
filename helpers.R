@@ -113,7 +113,7 @@ logHistogram <- function(dbname, query, title, xtitle, ytitle, filename = NULL) 
     g = g + ggtitle(title)
     g = g + theme(plot.title = element_text(hjust = 0.5))
     if (!is.null(filename))
-        ggsave(paste("graphs/", dbname, "/filename", ".pdf", sep=""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
+        ggsave(paste("graphs/", dbname, "/", filename, sep=""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
     g
 }
 
@@ -138,13 +138,12 @@ normalHistogram <- function(dbname, query, title, xtitle, ytitle, filename = NUL
     g = g + ggtitle(title)
     g = g + theme(plot.title = element_text(hjust = 0.5))
     if (!is.null(filename))
-        ggsave(paste("graphs/", dbname, "/filename", ".pdf", sep=""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
+        ggsave(paste("graphs/", dbname, "/", filename, sep=""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
     g
 }
 
 normalHistogramLogY <- function(dbname, query, title, xtitle, ytitle, filename = NULL) {
     linetypes = c("Median" = "solid", "Mean" = "dashed")
-    
     sql.connect(username = DB_USER, password = DB_PASSWORD, dbname = dbname, host = DB_HOST)
     query = sql.query(query)[[1]]
     sql.disconnect()
@@ -163,13 +162,12 @@ normalHistogramLogY <- function(dbname, query, title, xtitle, ytitle, filename =
     g = g + theme(plot.title = element_text(hjust = 0.5))
     g = g + scale_y_log10(ytitle)
     if (!is.null(filename))
-        ggsave(paste("graphs/", dbname, "/filename", ".pdf", sep=""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
+        ggsave(paste("graphs/", dbname, "/", filename, sep=""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
     g
 }
 
 logHistogramFromDF <- function(data, column, title, xtitle, ytitle, filename = NULL, summary = T) {
     linetypes = c("Median" = "solid", "Mean" = "dashed")
-    
     data = data.frame(x = data[[column]])
     # calculate the breaks so that we fill the range
     breaks = 1
@@ -201,7 +199,7 @@ logHistogramFromDF <- function(data, column, title, xtitle, ytitle, filename = N
     g = g + ggtitle(title)
     g = g + theme(plot.title = element_text(hjust = 0.5))
     if (!is.null(filename))
-        ggsave(paste("graphs/", title, "/filename", ".pdf", sep=""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
+        ggsave(paste("graphs/", title, "/", filename, sep=""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
     g
 }
 
@@ -260,11 +258,11 @@ logHistogramDouble = function(db1, query, db1Title, db2Title, title, xtitle, yti
     g = g + ggtitle(title)
     g = g + theme(plot.title = element_text(hjust = 0.5))
     if (!is.null(filename))
-        ggsave(paste("graphs/", db1, "/filename", ".pdf", sep=""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
+        ggsave(paste("graphs/", db1, "/", filename, sep=""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
     g
 }
 
-filesOverTime = function(outputFolder, js_aggregate, filename) {
+filesOverTime = function(dname, js_aggregate, filename) {
     cols <- c(
         "non-test duplicates"="#a0a0a0",
         "test duplicates"="#808080",
@@ -295,11 +293,11 @@ filesOverTime = function(outputFolder, js_aggregate, filename) {
     g = g + scale_fill_manual(name = "Legend", values=cols, breaks = names(cols))
     g = g + ggtitle("Files over time")
     g = g + theme(plot.title = element_text(hjust = 0.5))
-    ggsave(paste(outputFolder, "/", filename, sep = ""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
+    ggsave(paste("graphs/", dname, "/", filename, sep = ""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
     g
 }
 
-nonNpmFilesOverTime = function(outputFolder, js_aggregate, filename) {
+nonNpmFilesOverTime = function(dname, js_aggregate, filename) {
     cols <- c(
         "non-test duplicates"="#c0c0c0",
         "test duplicates"="#808080",
@@ -326,11 +324,11 @@ nonNpmFilesOverTime = function(outputFolder, js_aggregate, filename) {
     g = g + scale_linetype_manual(name=" ", values = cols)
     g = g + ggtitle("Non - NPM Files over time")
     g = g + theme(plot.title = element_text(hjust = 0.5))
-    ggsave(paste(outputFolder, "/", filename, sep = ""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
+    ggsave(paste("graphs/", dname, "/", filename, sep = ""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
     g
 }
 
-nonUniqueFilesOverTime = function(outputFolder, js_aggregate, filename, bounds = c(70, 100)) {
+nonUniqueFilesOverTime = function(dname, js_aggregate, filename, bounds = c(70, 100)) {
     cols <- c(
         "# of all files"="#c0c0c0",
         "# of NPM files"="#a0a0a0",
@@ -364,8 +362,7 @@ nonUniqueFilesOverTime = function(outputFolder, js_aggregate, filename, bounds =
     g = g + scale_linetype_manual(name=" ", values = cols)
     g = g + ggtitle("% of non-unique files")
     g = g + theme(plot.title = element_text(hjust = 0.5))
-    ggsave(paste(outputFolder, "/", filename, sep = ""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
-    xxxyyyy <<- data
+    ggsave(paste("graphs/", dname, "/", filename, sep = ""), width = 68 * 2.5, height = 55 * 2.5, units = "mm")
     g
 }
 
@@ -758,7 +755,7 @@ DB_CONNECTION_ = NULL
 LAST_SQL_TIME_ = NULL
 
 # connects to the given db server and opens the database name, if the database name does not exist, creates it. Keeps the connection alive 
-sql.connect <- function(username, password, dbname, host = "localhost") {
+sql.connect <- function(username = DB_USER, password = DB_PASSWORD, dbname, host = DB_HOST) {
     # disconnect first, if we have existing connection
     sql.disconnect()
     tryCatch({
@@ -859,27 +856,325 @@ sql.switchDb <- function(dbName) {
 }
 
 # wrapper function for creating all graphs shown in the paper ---------------------------------------------------------
+
+# prints table 1 in the paper - the corpus statistics
+tableCorpus <- function(dbname) {
+    sql.connect(dbname = dbname)
+    println("    Counts:")
+    println("      Projects downloaded      ", sql.query("SELECT COUNT(*) FROM projects"))
+    println("      Projects analyzed        ", sql.query("SELECT COUNT(*) FROM projects WHERE files > 0"))
+    println("      Files analyzed           ", sql.query("SELECT COUNT(*) FROM files"))
+    println("    Means:")
+    println("      Files per project        ",mean(sql.query("SELECT files FROM projects")[[1]]))
+    println("      SLOC per file            ",mean(sql.query("SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    println("      Stars per project        ",mean(sql.query("SELECT stars FROM projects")[[1]]))
+    println("      Commits per project      ",mean(sql.query("SELECT commits FROM projects")[[1]]))
+    sql.disconnect()
+}
+
+fileLevelDup <- function(dbname) {
+    sql.connect(dbname = dbname)
+    totalFiles = sql.query("SELECT COUNT(*) FROM files")[[1]]
+    fileHashes = sql.query("SELECT COUNT(*) FROM stats")[[1]]
+    tokenHashes = sql.query("SELECT COUNT(DISTINCT tokenHash) FROM stats")[[1]]
+    sccDup = sql.query("SELECT COUNT(id) FROM (SELECT fileId1 AS id FROM CCPairs UNION SELECT fileId2 AS id FROM CCPairs) AS x")[[1]]
+    println("    Total files                ", totalFiles)
+    println("    File hashes                ", fileHashes, " (", fileHashes/totalFiles, "%)")
+    println("    Token hashes               ", tokenHashes, " (", tokenHashes/totalFiles, "%)")
+    println("    SCCdupfiles                ", sccDup)
+    println("    SCCuniquefiles             ", tokenHashes - sccDup, "(", (tokenHashes - sccDup) / totalFiles, "%)")
+    sql.disconnect()
+}
+
+fileLevelDupNoSmall <- function(dbname) {
+    sql.connect(dbname = dbname)
+    totalFiles = sql.query("SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash WHERE totalTokens >= 50")[[1]]
+    fileHashes = sql.query("SELECT COUNT(*) FROM stats WHERE totalTokens >= 50")[[1]]
+    tokenHashes = sql.query("SELECT COUNT(DISTINCT tokenHash) FROM stats WHERE totalTokens >= 50")[[1]]
+    sccDup = sql.query("SELECT COUNT(id) FROM (SELECT fileId1 AS id FROM CCPairs UNION SELECT fileId2 AS id FROM CCPairs) AS x JOIN files ON id = fileId JOIN stats ON files.fileHash = stats.fileHash WHERE totalTokens >=50")[[1]]
+    println("    Total files                ", totalFiles)
+    println("    File hashes                ", fileHashes, " (", fileHashes/totalFiles, "%)")
+    println("    Token hashes               ", tokenHashes, " (", tokenHashes/totalFiles, "%)")
+    println("    SCCdupfiles                ", sccDup)
+    println("    SCCuniquefiles             ", tokenHashes - sccDup, "(", (tokenHashes - sccDup) / totalFiles, "%)")
+    sql.disconnect()
+}
+
+interProjectCloning <- function(dbname) {
+    sql.connect(dbname = dbname)
+    println("    Projects analyzed          ", sql.query("SELECT COUNT(*) FROM projects WHERE files > 0"))
+    println("    Clones >=50%               ", sql.query("select count(*) from (select distinct cloneId from projectClones where cloneCloningPercent >= 50 union select distinct hostId from projectClones where hostAffectedPercent >= 50) as combined"))
+    println("    Clones >=80%               ", sql.query("select count(*) from (select distinct cloneId from projectClones where cloneCloningPercent >= 80 union select distinct hostId from projectClones where hostAffectedPercent >= 80) as combined"))
+    println("    Clones 100%                ", sql.query("select count(*) from (select distinct cloneId from projectClones where cloneCloningPercent = 100 union select distinct hostId from projectClones where hostAffectedPercent = 100) as combined"))
+    println("    exact dups                 ", sql.query("select count(*) from (select distinct cloneId from projectClones where cloneCloningPercent = 100 and hostAffectedPercent = 100 union select distinct hostId from projectClones where cloneCloningPercent = 100 and hostAffectedPercent = 100) as combined"))
+    println("    exact dups (>= files)      ", sql.query("select count(*) from (select distinct cloneId from projectClones where cloneCloningPercent = 100 and hostAffectedPercent = 100 and cloneTotalFiles >= 10 union select distinct hostId from projectClones where cloneCloningPercent = 100 and hostAffectedPercent = 100 and hostTotalFiles >= 10) as combined"))
+    sql.disconnect()
+}
+
+tokensPerFileQuantiles <- function(dbname) {
+    sql.connect(dbname = dbname)
+    x = sql.query("SELECT totalTokens FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]
+    sql.disconnect()
+    quantile(x, c(.20,0.30,.45,.55,.70,.80,.90))
+}
+
+metadataCorpus <- function(dbname) {
+    sql.connect(dbname = dbname)
+    println("    Projects analyzed          ", sql.query("SELECT COUNT(*) FROM projects WHERE files > 0"))
+    println("    Projects with 1+ commits   ", sql.query("SELECT COUNT(*) FROM projects WHERE files > 0 AND commits > 0"))
+    sql.disconnect()
+}
+
+filesPerProjectDist <- function(dbname, path) {
+    heatmap = read.csv(paste(path, "/heatmap.csv", sep=""), header = F, col.names = c("pid", "stars", "commits", "files", "originalFiles","containsClones"))
+    logHistogramFromDF(heatmap, "files", dbname, "Files per Project", "% of Projects", "Hist_files_per_project.pdf")    
+}
+
+slocPerFileDist <- function(dbname) {
+    logHistogram(dbname, "SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash ORDER BY RAND() LIMIT 1000000", dbname, "SLOC", "% of projects", "Hist_sloc_per_file.pdf")
+}
+
+starsPerProjectDist <- function(dbname, path) {
+    heatmap = read.csv(paste(path, "/heatmap.csv", sep=""), header = F, col.names = c("pid", "stars", "commits", "files", "originalFiles","containsClones"))
+    logHistogramFromDF(heatmap, "stars", dbname, "Stars", "% of Projects", "Hist_stars_per_project.pdf")
+}
+
+commitsPerProjectDist <- function(dbname, path) {
+    heatmap = read.csv(paste(path, "/heatmap.csv", sep=""), header = F, col.names = c("pid", "stars", "commits", "files", "originalFiles","containsClones"))
+    logHistogramFromDF(heatmap, "commits", dbname, "Commits", "% of Projects", "Hist_commits_per_project.pdf")
+}
+
+summaryStats <- function(dbname) {
+    sql.connect(dbname = dbname)
+    println("Files per project")
+    print(summary(sql.query("SELECT files FROM projects")[[1]]))
+    println("Bytes per file")
+    print(summary(sql.query("SELECT fileBytes FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    println("Lines per file")
+    print(summary(sql.query("SELECT fileLines FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    println("LOC per file")
+    print(summary(sql.query("SELECT fileLOC FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    println("SLOC per file")
+    print(summary(sql.query("SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    println("Distinct tokens per file")
+    print(summary(sql.query("SELECT uniqueTokens FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    sql.disconnect()
+}
+
+summaryStatsTokenHash <- function(dbname) {
+    sql.connect(dbname = dbname)
+    println("Files per project")
+    print(summary(sql.query("SELECT COUNT(*) FROM (SELECT MIN(projectId) AS pid, COUNT(*) AS cnt FROM files JOIN stats ON files.fileHash = stats.fileHash GROUP BY tokenHash) AS x WHERE x.cnt = 1 GROUP BY x.pid")[[1]]))
+    println("Bytes per file")
+    print(summary(sql.query("SELECT AVG(fileBytes) FROM stats GROUP BY tokenHash")[[1]]))
+    println("Lines per file")
+    print(summary(sql.query("SELECT AVG(fileLines) FROM stats GROUP BY tokenHash")[[1]]))
+    println("LOC per file")
+    print(summary(sql.query("SELECT AVG(fileLOC) FROM stats GROUP BY tokenHash")[[1]]))
+    println("SLOC per file")
+    print(summary(sql.query("SELECT AVG(fileSLOC) FROM stats GROUP BY tokenHash")[[1]]))
+    println("Distinct tokens per file")
+    print(summary(sql.query("SELECT AVG(uniqueTokens) FROM stats GROUP BY tokenHash")[[1]]))
+    sql.disconnect()
+}
+
+summaryStatsFileHash <- function(dbname) {
+    #SELECT COUNT(*) FROM (SELECT MIN(projectId) AS pid, COUNT(*) AS cnt FROM files GROUP BY fileHash) AS x WHERE x.cnt = 1 GROUP BY x.pid
+    sql.connect(dbname = dbname)
+    println("Files per project")
+    print(summary(sql.query("SELECT COUNT(*) FROM (SELECT MIN(projectId) AS pid, COUNT(*) AS cnt FROM files GROUP BY fileHash) AS x WHERE x.cnt = 1 GROUP BY x.pid")[[1]]))
+    println("Bytes per file")
+    print(summary(sql.query("SELECT fileBytes FROM stats")[[1]]))
+    println("Lines per file")
+    print(summary(sql.query("SELECT fileLines FROM stats")[[1]]))
+    println("LOC per file")
+    print(summary(sql.query("SELECT fileLOC FROM stats")[[1]]))
+    println("SLOC per file")
+    print(summary(sql.query("SELECT fileSLOC FROM stats")[[1]]))
+    println("Distinct tokens per file")
+    print(summary(sql.query("SELECT uniqueTokens FROM stats")[[1]]))
+    sql.disconnect()
+}
+
+
 # Rscript -e "source('config.R'); source('helpers.R'); println('hello');"
-allGraphs <- function(pathRoot, datasets, outputDir) {
+allGraphs <- function(pathRoot, datasets) {
+    library(ggplot2)
     datasetPaths = paste(pathRoot, datasets, sep = "/")
-    outputDirs = paste(outputDir, datasets, sep = "/")
+    outputDirs = paste("graphs", datasets, sep = "/")
     println("creating output directories")
-#    for ()
-    for (dname in datasets) {
-        #odir = 
+    for (dname in outputDirs) {
+        println("  ", dname)
+        if (! dir.exists(dname))
+            dir.create(dname, recursive = T, showWarnings = F)
     }
-        
     println("creating heatmaps...")
-    for (dname in datasets) {
-        path = paste(datasetsPath)
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        dpath = datasetPaths[[i]]
+        println("  ", dname)
+        createHeatmap(dname, dpath, "commits")
+    }
+    println("corpus statistics...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        println("  ", dname)
+        tableCorpus(dname)
+    }
+    println("file level duplication...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        println("  ", dname)
+        fileLevelDup(dname)
+    }
+    println("file level duplication (w/o small files...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        println("  ", dname)
+        fileLevelDupNoSmall(dname)
+    }
+    println("inter project cloning...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        println("  ", dname)
+        interProjectCloning(dname)
+    }
+    println("tokens per file...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        println("  ", dname)
+        print(tokensPerFileQuantiles(dname))
+    }
+    println("metadata corpus...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        println("  ", dname)
+        metadataCorpus(dname)
+    }
+    println("files per project...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        dpath = datasetPaths[[i]]
+        println("  ", dname)
+        filesPerProjectDist(dname, dpath)
+    }
+    println("SLOC per file...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        println("  ", dname)
+        slocPerFileDist(dname)
+    }
+    println("stars per project...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        dpath = datasetPaths[[i]]
+        println("  ", dname)
+        starsPerProjectDist(dname, dpath)
+    }
+    println("commits per project...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        dpath = datasetPaths[[i]]
+        println("  ", dname)
+        commitsPerProjectDist(dname, dpath)
+    }
+    println("Summary stats...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        println("  ", dname)
+        summaryStats(dname)
+    }
+    println("Summary stats (minimal token hash)...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        println("  ", dname)
+        summaryStatsTokenHash(dname)
+    }
+    println("Summary stats (minimal file hash)...")
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        println("  ", dname)
+        summaryStatsFileHash(dname)
+    }
+}
+
+
+
+
+npmFilesInProjects <- function(dname) {
+    query = paste("SELECT 100 - (y.files / x.files) * 100  FROM projects AS x JOIN ", dname, "_nonpm.projects AS y ON x.projectId = y.projectId WHERE x.files != y.files", sep="")
+    normalHistogram(dname, query, "% of NPM files", "% of NPM files", "% of projects", "npm_proj_pct.pdf")
+}
+
+npmDirectImports <- function(dname) {
+    normalHistogram(dname, "SELECT COUNT(DISTINCT blameModule) FROM files_nm JOIN files ON files_nm.fileId = files.fileId WHERE npmDepth > 0 GROUP BY projectId", "Direct Imports per Module", "# of modules directly imported", "% of projects", "npm_direct.pdf")
+}
+
+npmPopularity <- function(dname) {
+    normalHistogramLogY(dname, "SELECT count FROM (SELECT COUNT(DISTINCT projectId) AS count FROM files_nm JOIN files ON files_nm.fileId = files.fileId WHERE npmDepth> 0 GROUP BY blameModule) AS x WHERE count > 0", "Module popularity", "How many projects directly import a module", "# of modules", "npm_pop.pdf")
+
+}
+
+js_npm_cloneGroupSize <- function(dname) {
+    logHistogramDouble(dname, "SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash GROUP BY tokenHash", "all", "no NPM", "JavaScript", "Clone Group Size", "% of projects", "file-clone-group-sizes-npm.pdf")
+}
+
+js_npm_filesPerProject <- function(dname) {
+    logHistogramDouble(dname, "SELECT files FROM projects", "all", "no NPM", "JavaScript", "Files per Project", "% of projects", "Hist_files_per_project_npm.pdf")
+}
+
+js_npm_slocPerFile <- function(dname) {
+    logHistogramDouble(dname, "SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash ORDER BY RAND() LIMIT 1000000", "all", "no NPM", "JavaScript", "SLOC", "% of projects", "Hist_sloc_per_file_npm.pdf")
+}
+
+js_npm_commitsPerProject <- function(dname) {
+    logHistogramDouble(dname, "SELECT commits FROM projects", "all", "no NPM", "JavaScript", "Commits", "% of projects", "Hist_commits_per_project_js2.pdf", paste("SELECT commits FROM projects JOIN ", dname, ".projects AS x ON projects.projectId = x.projectId WHERE projects.files = x.files", sep=""))
+}
+
+js_npm_starsPerProject <- function(dname) {
+    logHistogramDouble(dname, "SELECT stars FROM projects", "all", "no NPM", "JavaScript", "Stars", "% of projects", "Hist_stars_per_project_js2.pdf", paste("SELECT stars FROM projects JOIN ", dname, ".projects AS x ON projects.projectId = x.projectId WHERE projects.files = x.files", sep=""))
+}
+
+jsGraphs <- function(pathRoot, jsDataset) {
+    datasetPath = paste(pathRoot, jsDataset, sep="/")
+    println("JS only graphs...")
+    js_aggregate = read.table(paste(datasetPath,"aggregated_files.csv", sep = "/"), header = F, col.names = c("time", 1:32), colClasses = rep("integer", 33))
+    println("  files over time...")
+    filesOverTime(jsDataset, js_aggregate, paste("time_",jsDataset,"_files_bw.pdf", sep = ""))
+    println("  npm files over time...")
+    nonNpmFilesOverTime(jsDataset, js_aggregate, paste("time_",jsDataset,"_files_nonpm_bw.pdf", sep = ""))
+    println("  non unique files over time...")
+    nonUniqueFilesOverTime(jsDataset, js_aggregate, paste("time_", jsDataset, "_dup_bw.pdf", sep = ""))
+    println("  npm files in projects...")
+    npmFilesInProjects(jsDataset)
+    println("  npm direct imports...")
+    npmDirectImports(jsDataset)
+    println("  npm popularity...")
+    npmPopularity(jsDataset)
+    println("  clone group size...")
+    js_npm_cloneGroupSize(jsDataset)
+    println("  files per project...")
+    js_npm_filesPerProject(jsDataset)
+    println("  sloc per file...")
+    js_npm_slocPerFile(jsDataset)
+    println("  commits per project...")
+    js_npm_commitsPerProject(jsDataset)
+    println("  stars per project...")
+    js_npm_starsPerProject(jsDataset)
+}
+
+artifactFullDataset <- function() {
+    allGraphs("/home/peta/devel/oopsla17-artifact/datasets", "js")
+    jsGraphs("/home/peta/devel/oopsla17-artifact/datasets", "js")
+}
+
+x <- function() {
+    for (i in 1:length(datasets)) {
+        dname = datasets[[i]]
+        dpath = datasetPaths[[i]]
+        outdir = outputDirs[[i]]
+        println("  ", dname)
         
     }
-    heatmap = read.csv(paste(DATASET_PATH, "/heatmap.csv", sep=""), header = F, col.names = c("pid", "stars", "commits", "files", "originalFiles","containsClones"))
-    createHeatmap(DATASET_NAME, DATASET_PATH, "commits")
-    
-    
-    
-    
-    
 }
 

@@ -36,8 +36,6 @@ Where `NUM_CHUNKS` is number of chunks produced by the clone finder (i.e. how ma
 
 JavaScript tokeizer produces extra information for its projects and files, stored in the `projects_extra.txt` and `files_extra.txt` files. When imported, these will add columns to the `projects` and `files` tables. The `importJSExtras` function in `functions.R` does this:
 
->! TODO CHECK THIS WORKS!!!!!!
-
 ```{r}
 importJSExtras(DATASET_NAME, DATASET_PATH)
 ```

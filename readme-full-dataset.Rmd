@@ -17,12 +17,34 @@ All datasets contain at least the basic tables & columns required for the graphs
 
 ## Producing the graphs
 
-Calculating all the graphs for the entire datasets is very time consuming process (hours) so we do not provide an executable notebook. Instead we recommend you use `Rscript` to run the `allGraphs()` function in `helpers.R` file that would calculate all graphs for all languages and output them in `~/graphs/LANGUAGE` where `LANGUAGE` is `cpp`, `java`, `python`, `jsHalf`. We also recommend that you use `tmux` so that you do not have to be connected to the machine for the entire duration of the task, i.e:
+Calculating all the graphs for the entire datasets is very time consuming process (hours) so we do not provide an executable notebook. Instead we recommend you execute the following in the shell:
 
     tmux
     cd ~/pipeline
-    Rscript -e "source('config.R'); source('helpers.R'); allGraphs('/home/oopsla/datasets', c('cpp','java','python','jsHalf'), '/home/oopsla/graphs');"
+    Rscript -e "source('config.R'); source('helpers.R'); artifactFullDataset();"
     
-This will take hours to finish, but you can close the connection. When you connect to `ginger` again to check the progress simply type:
+This will run the `artifactFullDataset` function we provide that calculates the outputs described in the VM in steps 8 and 9. By using `tmux` you can close the connection and return to it any time later by executing the following command when logged on `ginger`:
 
     tmux attach
+    
+For details, see the `tmux` command help. 
+
+When done, the output of the script will contain all numeric values calculated for the four languages. The script will also create the following directories, which would contain the graphs as presented in the paper:
+
+    ~/pipeline/graphs/cpp
+    ~/pipeline/graphs/java
+    ~/pipeline/graphs/python
+    ~/pipeline/graphs/jsHalf
+
+## Dataset snapshot
+
+You have full read access to the datasets presented in the paper under the following:
+
+    ~/pipeline/datasets/cpp
+    ~/pipeline/datasets/java
+    ~/pipeline/datasets/python
+    ~/pipeline/datasets/jsHalf
+
+These contain the snapshots of the database after the processing steps. 
+    
+    

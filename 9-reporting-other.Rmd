@@ -18,8 +18,8 @@ js_aggregate = read.table(paste.path(DATASET_PATH,"aggregated_files.csv"), heade
 ```
 
 ```{r}
-filesOverTime(DATASET_PATH, js_aggregate, paste("time_",DATASET_NAME,"_files_bw.pdf", sep = ""))
-nonNpmFilesOverTime(DATASET_PATH, js_aggregate, paste("time_",DATASET_NAME,"_files_nonpm_bw.pdf", sep = ""))
+filesOverTime(DATASET_NAME, js_aggregate, paste("time_",DATASET_NAME,"_files_bw.pdf", sep = ""))
+nonNpmFilesOverTime(DATASET_NAME, js_aggregate, paste("time_",DATASET_NAME,"_files_nonpm_bw.pdf", sep = ""))
 ```
 
 
@@ -27,7 +27,7 @@ nonNpmFilesOverTime(DATASET_PATH, js_aggregate, paste("time_",DATASET_NAME,"_fil
 ## Fig 7 -  Percentage of clones over time
 
 ```{r}
-nonUniqueFilesOverTime(DATASET_PATH, js_aggregate, paste("time_", DATASET_NAME, "_dup_bw.pdf", sep = ""), bounds = c(0, 100))
+nonUniqueFilesOverTime(DATASET_NAME, js_aggregate, paste("time_", DATASET_NAME, "_dup_bw.pdf", sep = ""), bounds = c(0, 100))
 ```
 
 
@@ -35,18 +35,14 @@ nonUniqueFilesOverTime(DATASET_PATH, js_aggregate, paste("time_", DATASET_NAME, 
 ## Fig 8 - % of NPM files in projects and directly imported NPM packages
 
 ```{r}
-query = paste("SELECT 100 - (y.files / x.files) * 100  FROM projects AS x JOIN ", DATASET_NAME, "_nonpm.projects AS y ON x.projectId = y.projectId WHERE x.files != y.files", sep="")
-normalHistogram(DATASET_NAME, query, "% of NPM files", "% of NPM files", "% of projects", "npm_proj_pct.pdf")
-```
-
-```{r}
-normalHistogram(DATASET_NAME, "SELECT COUNT(DISTINCT blameModule) FROM files_nm JOIN files ON files_nm.fileId = files.fileId WHERE npmDepth > 0 GROUP BY projectId", "Direct Imports per Module", "# of modules directly imported", "% of projects", "npm_direct.pdf")
+npmFilesInProjects(DATASET_NAME)
+npmDirectImports(DATASET_NAME)
 ```
 
 ## Fig 9 - Popularity of NPM modules.
 
 ```{r}
-normalHistogramLogY(DATASET_NAME, "SELECT count FROM (SELECT COUNT(DISTINCT projectId) AS count FROM files_nm JOIN files ON files_nm.fileId = files.fileId WHERE npmDepth> 0 GROUP BY blameModule) AS x WHERE count > 0", "Module popularity", "How many projects directly import a module", "# of modules", "npm_pop.pdf")
+npmPopularity(DATASET_NAME)
 ```
 
 # NPM and non-NPM Versions of Common Graphs
@@ -54,31 +50,31 @@ normalHistogramLogY(DATASET_NAME, "SELECT count FROM (SELECT COUNT(DISTINCT proj
 ## Figuree 3
 
 ```{r}
-logHistogramDouble(DATASET_NAME, "SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash GROUP BY tokenHash", "all", "no NPM", "JavaScript", "Clone Group Size", "% of projects", "file-clone-group-sizes-npm.pdf")
+js_npm_cloneGroupSize(DATASET_NAME)
 ```
 
 
 ## Files per project 
 
 ```{r}
-logHistogramDouble(DATASET_NAME, "SELECT files FROM projects", "all", "no NPM", "JavaScript", "Files per Project", "% of projects", "Hist_files_per_project_npm.pdf")
+js_npm_filesPerProject(DATASET_NAME)
 ```
 
 ## SLOC per file
 
 ```{r}
-logHistogramDouble(DATASET_NAME, "SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash ORDER BY RAND() LIMIT 1000000", "all", "no NPM", "JavaScript", "SLOC", "% of projects", "Hist_sloc_per_file_npm.pdf")
+js_npm_slocPerFile(DATASET_NAME)
 ```
 
 ## Stars per Project
 
 ```{r}
-logHistogramDouble(DATASET_NAME, "SELECT stars FROM projects", "all", "no NPM", "JavaScript", "Stars", "% of projects", "Hist_stars_per_project_js2.pdf", paste("SELECT stars FROM projects JOIN ", DATASET_NAME, ".projects AS x ON projects.projectId = x.projectId WHERE projects.files = x.files", sep=""))
+js_npm_starsPerProject(DATASET_NAME)
 ```
 
 
 ## Commits per project
 
 ```{r}
-logHistogramDouble(DATASET_NAME, "SELECT commits FROM projects", "all", "no NPM", "JavaScript", "Commits", "% of projects", "Hist_commits_per_project_js2.pdf", paste("SELECT commits FROM projects JOIN ", DATASET_NAME, ".projects AS x ON projects.projectId = x.projectId WHERE projects.files = x.files", sep=""))
+js_npm_commitsPerProject(DATASET_NAME)
 ```
