@@ -133,6 +133,8 @@ f(JAVA_DB, JAVA_PATH)
 f(PYTHON_DB, PYTHON_PATH)
 ```
 
+LOAD DATA INFILE '/home/peta/js/projects.csv' INTO TABLE projects FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'
+
 ## Fixing the projectClones layout
 
 ```{r}

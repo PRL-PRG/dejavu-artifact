@@ -446,8 +446,8 @@ importCommonData <- function(inputFolder) {
                                     fileHash BIGINT NOT NULL,
                                     fileBytes INT NOT NULL,
                                     fileLines INT NOT NULL,
-                                    fileLOC INT NOT NULL,
                                     fileSLOC INT NOT NULL,
+                                    fileLOC INT NOT NULL,
                                     totalTokens INT NOT NULL,
                                     uniqueTokens INT NOT NULL,
                                     tokenHash BIGINT NOT NULL,
@@ -865,10 +865,10 @@ tableCorpus <- function(dbname) {
     println("      Projects analyzed        ", sql.query("SELECT COUNT(*) FROM projects WHERE files > 0"))
     println("      Files analyzed           ", sql.query("SELECT COUNT(*) FROM files"))
     println("    Means:")
-    println("      Files per project        ",mean(sql.query("SELECT files FROM projects")[[1]]))
-    println("      SLOC per file            ",mean(sql.query("SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
-    println("      Stars per project        ",mean(sql.query("SELECT stars FROM projects")[[1]]))
-    println("      Commits per project      ",mean(sql.query("SELECT commits FROM projects")[[1]]))
+    println("      Files per project        ",median(sql.query("SELECT files FROM projects")[[1]]))
+    println("      SLOC per file            ",median(sql.query("SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
+    println("      Stars per project        ",median(sql.query("SELECT stars FROM projects")[[1]]))
+    println("      Commits per project      ",median(sql.query("SELECT commits FROM projects")[[1]]))
     sql.disconnect()
 }
 
@@ -1033,12 +1033,12 @@ allGraphs <- function(pathRoot, datasets) {
         println("  ", dname)
         fileLevelDupNoSmall(dname)
     }
-    println("inter project cloning...")
-    for (i in 1:length(datasets)) {
-        dname = datasets[[i]]
-        println("  ", dname)
-        interProjectCloning(dname)
-    }
+    #println("inter project cloning...")
+    #for (i in 1:length(datasets)) {
+    #    dname = datasets[[i]]
+    #    println("  ", dname)
+    #    interProjectCloning(dname)
+    #}
     println("tokens per file...")
     for (i in 1:length(datasets)) {
         dname = datasets[[i]]
@@ -1164,8 +1164,8 @@ jsGraphs <- function(pathRoot, jsDataset) {
 }
 
 artifactFullDataset <- function() {
-    allGraphs("/home/peta/devel/oopsla17-artifact/datasets", "js")
-    jsGraphs("/home/peta/devel/oopsla17-artifact/datasets", "js")
+    allGraphs("/home/peta/devel/dejavu-artifact/datasets", "js")
+    jsGraphs("/home/peta/devel/dejavu-artifact/datasets", "js")
 }
 
 x <- function() {
