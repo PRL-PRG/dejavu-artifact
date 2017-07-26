@@ -24,3 +24,10 @@ importSourcerer(DATASET_NAME, DATASET_PATH)
 
 [Project Clones](5-project-clones.nb.html) in file [`5-project-clones.Rmd`](5-project-clones.Rmd).
 
+
+
+```{r}
+sql.connect(dbname = "javaFull")
+calculateProjectSizes()
+sql.disconnect()
+```

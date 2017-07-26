@@ -865,10 +865,15 @@ tableCorpus <- function(dbname) {
     println("      Projects analyzed        ", sql.query("SELECT COUNT(*) FROM projects WHERE files > 0"))
     println("      Files analyzed           ", sql.query("SELECT COUNT(*) FROM files"))
     println("    Means:")
-    println("      Files per project        ",median(sql.query("SELECT files FROM projects")[[1]]))
-    println("      SLOC per file            ",median(sql.query("SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]))
-    println("      Stars per project        ",median(sql.query("SELECT stars FROM projects")[[1]]))
-    println("      Commits per project      ",median(sql.query("SELECT commits FROM projects")[[1]]))
+    
+    x = sql.query("SELECT files FROM projects")[[1]]
+    println("      Files per project        ",median(x), " sd: ", sd(x))
+    x = sql.query("SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]
+    println("      SLOC per file            ",median(x), " sd: ", sd(x))
+    x = sql.query("SELECT stars FROM projects")[[1]]
+    println("      Stars per project        ",median(x), " sd: ", sd(x))
+    x = sql.query("SELECT commits FROM projects")[[1]]
+    println("      Commits per project      ",median(x), " sd: ", sd(x))
     sql.disconnect()
 }
 
@@ -914,9 +919,27 @@ interProjectCloning <- function(dbname) {
 tokensPerFileQuantiles <- function(dbname) {
     sql.connect(dbname = dbname)
     x = sql.query("SELECT totalTokens FROM files JOIN stats ON files.fileHash = stats.fileHash")[[1]]
+    result = list()
+    result$q = quantile(x, c(.20,0.30,.45,.55,.70,.80,.90))
+    q1 = result$q[[1]]
+    q2 = result$q[[2]]
+    q3 = result$q[[3]]
+    q4 = result$q[[4]]
+    q5 = result$q[[5]]
+    q6 = result$q[[6]]
+    q7 = result$q[[7]]
+    s1 = sql.query("SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash WHERE totalTokens >= ",q1, " AND totalTokens <=", q2)[[1]]
+    s2 = sql.query("SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash WHERE totalTokens >= ",q3, " AND totalTokens <=", q4)[[1]]
+    s3 = sql.query("SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash WHERE totalTokens >= ",q5, " AND totalTokens <=", q6)[[1]]
+    s4 = sql.query("SELECT COUNT(*) FROM files JOIN stats ON files.fileHash = stats.fileHash WHERE totalTokens >= ",q7)[[1]]
+    s = length(x) #sql.query("SELECT COUNT(*) FROM files")[[1]]
+    result$sums = c(s1, s2, s3, s4)
+    result$pct = c(s1/s, s2/s, s3/s, s4/s)
+    result$total = s
     sql.disconnect()
-    quantile(x, c(.20,0.30,.45,.55,.70,.80,.90))
+    result
 }
+
 
 metadataCorpus <- function(dbname) {
     sql.connect(dbname = dbname)
@@ -925,23 +948,23 @@ metadataCorpus <- function(dbname) {
     sql.disconnect()
 }
 
-filesPerProjectDist <- function(dbname, path) {
+filesPerProjectDist <- function(dbname, path, title = dbname) {
     heatmap = read.csv(paste(path, "/heatmap.csv", sep=""), header = F, col.names = c("pid", "stars", "commits", "files", "originalFiles","containsClones"))
-    logHistogramFromDF(heatmap, "files", dbname, "Files per Project", "% of Projects", "Hist_files_per_project.pdf")    
+    logHistogramFromDF(heatmap, "files", title, "Files per Project", "% of Projects", "Hist_files_per_project.pdf")    
 }
 
-slocPerFileDist <- function(dbname) {
-    logHistogram(dbname, "SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash ORDER BY RAND() LIMIT 1000000", dbname, "SLOC", "% of projects", "Hist_sloc_per_file.pdf")
+slocPerFileDist <- function(dbname, title = dbname) {
+    logHistogram(dbname, "SELECT fileSLOC FROM files JOIN stats ON files.fileHash = stats.fileHash ORDER BY RAND() LIMIT 1000000", title, "SLOC", "% of projects", "Hist_sloc_per_file.pdf")
 }
 
-starsPerProjectDist <- function(dbname, path) {
+starsPerProjectDist <- function(dbname, path, title = dbname) {
     heatmap = read.csv(paste(path, "/heatmap.csv", sep=""), header = F, col.names = c("pid", "stars", "commits", "files", "originalFiles","containsClones"))
-    logHistogramFromDF(heatmap, "stars", dbname, "Stars", "% of Projects", "Hist_stars_per_project.pdf")
+    logHistogramFromDF(heatmap, "stars", title, "Stars", "% of Projects", "Hist_stars_per_project.pdf")
 }
 
-commitsPerProjectDist <- function(dbname, path) {
+commitsPerProjectDist <- function(dbname, path, title = dbname) {
     heatmap = read.csv(paste(path, "/heatmap.csv", sep=""), header = F, col.names = c("pid", "stars", "commits", "files", "originalFiles","containsClones"))
-    logHistogramFromDF(heatmap, "commits", dbname, "Commits", "% of Projects", "Hist_commits_per_project.pdf")
+    logHistogramFromDF(heatmap, "commits", title, "Commits", "% of Projects", "Hist_commits_per_project.pdf")
 }
 
 summaryStats <- function(dbname) {

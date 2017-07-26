@@ -1,0 +1,126 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+DF <- dput(DF)
+structure(list(Year = c(2003L, 2004L, 2005L, 2006L, 2007L, 2008L, 
+2009L, 2010L, 2011L, 2012L, 2013L, 2014L, 2015L, 2003L, 2004L, 
+2005L, 2006L, 2007L, 2008L, 2009L, 2010L, 2011L, 2012L, 2013L, 
+2014L, 2015L, 2003L, 2004L, 2005L, 2006L, 2007L, 2008L, 2009L, 
+2010L, 2011L, 2012L, 2013L, 2014L, 2015L, 2003L, 2004L, 2005L, 
+2006L, 2007L, 2008L, 2009L, 2010L, 2011L, 2012L, 2013L, 2014L, 
+2015L), Metric = structure(c(1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 
+1L, 1L, 1L, 1L, 1L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 4L, 
+4L, 4L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 3L, 
+3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L, 3L), .Label = c("Demand", 
+"High", "Low", "Actual"), class = "factor"), MWh = c(498343L, 
+1250904L, 1665176L, 2317643L, 2455311L, 3557987L, 4268125L, 5403704L, 
+6596158L, 7814387L, 9008863L, 10291085L, 11796549L, 159677L, 
+192748L, 248844L, 372661L, 705656L, 838721L, 1188242L, 1708979L, 
+0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 3631730L, 
+5729024L, 6741785L, 9342798L, 11094798L, 0L, 0L, 0L, 0L, 0L, 
+0L, 0L, 0L, 1637220L, 1850615L, 2064011L, 2277406L, 2490801L)), .Names = c("Year", 
+"Metric", "MWh"), row.names = c(NA, -52L), class = "data.frame")
+
+             & Java   & C++    & Python & JavaScript\\ \hline \hline
+Total files  & 72,880,615 & 61,647,575 & 31,602,780 & 261,676,091\\ \hline \hline
+File hashes  & 43,713,084 (60\%) & 16,384,801 (27\%) & 9,157,622 (29\%) & 15,611,029 (6\%) \\ \hline
+Token hashes & 40,786,858 (56\%) & 14,425,319 (23\%) & 8,620,326 (27\%) & 13,587,850 (5\%) \\ \hline
+SCC dup files&  7,621,073 (25\%) & 6,200,301 (10\%)  & 2,732,747 (9\%) & 5,245,470 (2\%) \\ \hline
+SCC unique files & 10,236,611 (34\%) & 8,225,018 (13\%) & 5,887,579 (19\%) & 8,342,380 (3\%)\\ \hline 
+
+
+
+```{r}
+library(gridExtra)
+
+java = c(1,1,1)
+cpp = c(47222256, 6200301, 8225018)
+python = c(22982454, 2732747, 5887579)
+js = c(248088241, 5245470, 8342380)
+
+bigJava  = c(1,1,1)
+bigCpp = c(37613571, 5297028, 6596407)
+bigPython = c(16432156, 2105769, 4844125)
+bigJs = c(152062310, 3896989, 6177593)
+
+
+df = data.frame(
+    x = rep(1, 3),
+    kind = factor(c("Duplicated", "Cloned", "Unique"), levels = c("Duplicated", "Cloned", "Unique")),
+    java = java,
+    cpp = cpp,
+    python = python,
+    js = js
+)
+
+#extract legend
+#https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
+
+
+colors = c("#ffffff","#808080","#202020")
+
+
+pA = ggplot() + ggtitle("All Files              ") + theme_void() + theme(plot.title = element_text(hjust = 0.5, angle = 90))
+pB = ggplot() + ggtitle(">= 50 tokens         ") + theme_void() + theme(plot.title = element_text(hjust = 0.5, angle = 90))
+
+# Stacked bar graph -- this is probably not what you want
+p1 = ggplot(data=df, aes(x=x, y=java, fill=kind)) +
+    geom_bar(stat="identity", position = "fill", color = "black") + coord_polar("y", start=0) + theme_void() + ggtitle("Java") + theme(plot.title = element_text(hjust = 0.5)) + theme(legend.position="bottom") + scale_fill_manual(values=colors, name="")
+p2 = ggplot(data=df, aes(x=x, y=cpp, fill=kind)) +
+    geom_bar(stat="identity", position = "fill", color = "black") + coord_polar("y", start=0) + theme_void() + ggtitle("C/C++") + theme(plot.title = element_text(hjust = 0.5))  + scale_fill_manual(values=colors)
+p3 = ggplot(data=df, aes(x=x, y=python, fill=kind)) +
+    geom_bar(stat="identity", position = "fill", color = "black") + coord_polar("y", start=0) + theme_void() + ggtitle("Python") + theme(plot.title = element_text(hjust = 0.5)) + scale_fill_manual(values=colors)
+p4 = ggplot(data=df, aes(x=x, y=js, fill=kind)) +
+    geom_bar(stat="identity", position = "fill", color = "black") + coord_polar("y", start=0) + theme_void() + ggtitle("JavaScript") + theme(plot.title = element_text(hjust = 0.5)) + scale_fill_manual(values=colors)
+
+
+p5 = ggplot(data=df, aes(x=x, y=bigJava, fill=kind)) +
+    geom_bar(stat="identity", position = "fill", color = "black") + coord_polar("y", start=0) + theme_void() + scale_fill_manual(values=colors)
+p6 = ggplot(data=df, aes(x=x, y=bigCpp, fill=kind)) +
+    geom_bar(stat="identity", position = "fill", color = "black") + coord_polar("y", start=0) + theme_void() + scale_fill_manual(values=colors)
+p7 = ggplot(data=df, aes(x=x, y=bigPython, fill=kind)) +
+    geom_bar(stat="identity", position = "fill", color = "black") + coord_polar("y", start=0) + theme_void() + scale_fill_manual(values=colors)
+p8 = ggplot(data=df, aes(x=x, y=bigJs, fill=kind)) +
+    geom_bar(stat="identity", position = "fill", color = "black") + coord_polar("y", start=0) + theme_void() + scale_fill_manual(values=colors)
+
+
+
+mylegend<-g_legend(p1)
+
+
+
+#multiplot(p1, p2, p3, p4, cols=2)
+
+g = grid.arrange(arrangeGrob(
+        # all files
+        pA,
+        p1 + theme(legend.position = "none"),
+        p2 + theme(legend.position = "none"),
+        p3 + theme(legend.position = "none"),
+        p4 + theme(legend.position = "none"), 
+        # no small files
+        pB,
+        p5 + theme(legend.position = "none"),
+        p6 + theme(legend.position = "none"),
+        p7 + theme(legend.position = "none"),
+        p8 + theme(legend.position = "none"), 
+        nrow=2, widths = c(1, 10, 10, 10, 10)), mylegend, nrow = 2, heights=c(10, 1), padding = 0)
+ggsave(paste("graphs/", datasetName, "/heatmap.pdf", sep = "")) #, width = 68 * 2.5, height = 68 * 2.5, units = "mm")
+
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).

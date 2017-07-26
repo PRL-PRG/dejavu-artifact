@@ -70,6 +70,19 @@ cd tools/sccpreprocessor/src
 java SccPreprocessor aggregate ../../../datasets/js
 ```    
 
+## All NPM using projects
+
+This downloads `package.json` files for all projects if they have them. 
+
+```{bash}
+cd $R_NOTEBOOK_HOME
+mkdir pjsons
+cd tools/sccpreprocessor/src
+java SccPreprocessor npm ../../../datasets/js ../../../pjsons 8
+```
+
+Where first is the dataset name, then output folder whether the `packages.json` files will be stored and finally a number of threads to use.
+
 ## Next Steps
 
 [Reporting](8-reporting.nb.html) in file [`8-reporting.Rmd`](8-reporting.Rmd).

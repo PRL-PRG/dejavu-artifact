@@ -133,7 +133,10 @@ f(JAVA_DB, JAVA_PATH)
 f(PYTHON_DB, PYTHON_PATH)
 ```
 
-LOAD DATA INFILE '/home/peta/js/projects.csv' INTO TABLE projects FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'
+LOAD DATA INFILE '/home/peta/datasets/javaFull/projects.csv' INTO TABLE projects FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"';
+LOAD DATA INFILE '/home/peta/datasets/javaFull/stats.csv.h2i' INTO TABLE stats FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"';
+LOAD DATA INFILE '/home/peta/datasets/javaFull/files.csv.h2i' INTO TABLE files FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"';
+
 
 ## Fixing the projectClones layout
 
@@ -166,6 +169,30 @@ First add the columns, then create the metadata table, then update projects tabl
     LOAD DATA INFILE '/home/peta/python/metadata.csv' INTO TABLE metadata FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES;
     UPDATE projects JOIN metadata ON projects.projectId = metadata.projectId SET projects.stars = metadata.stars, projects.commits = metadata.commits;
     DROP TABLE metadata;
+    
+    
+
+    CREATE TABLE stars (
+        projectId BIGINT UNSIGNED NOT NULL,
+        projectPath VARCHAR(1000) NOT NULL,
+        stars INT NOT NULL,
+        PRIMARY KEY(projectId));
+    CREATE TABLE commits (
+        projectId BIGINT UNSIGNED NOT NULL,
+        projectPath VARCHAR(1000) NOT NULL,
+        commits INT NOT NULL,
+        PRIMARY KEY(projectId));
+        
+    LOAD DATA INFILE '/home/peta/datasets/javaFull/java-complete-commits-count-Final.txt' INTO TABLE commits FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+    LOAD DATA INFILE '/home/peta/datasets/javaFull/java-complete-stars-count-Final.txt' INTO TABLE stars FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+    
+    UPDATE projects JOIN stars ON projects.projectId = stars.projectId SET projects.stars = stars.stars;
+    UPDATE projects JOIN commits ON projects.projectId = commits.projectId SET projects.commits = commits.commits;
+    
+    DROP TABLE stars;
+    DROP TABLE commits;
+        
+        
     
 ## Exporting data for heatmap
 

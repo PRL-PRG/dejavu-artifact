@@ -78,3 +78,69 @@ js_npm_starsPerProject(DATASET_NAME)
 ```{r}
 js_npm_commitsPerProject(DATASET_NAME)
 ```
+
+## Qualitative Analysis
+
+project with the most only npm files:
+
+
+```{r}
+sql.connect(dbname = "js")
+```
+
+```
+SELECT js.projects.projectId, js.projects.files, js.projects.projectUrl FROM ( SELECT * FROM projects WHERE files = 0) AS X JOIN js.projects ON X.projectId = js.projects.projectId ORDER BY js.projects.files;
+```
+
+How many modules a project imports:
+
+```
+CREATE TABLE foo (SELECT MAX(npmDepth) AS maxDepth, COUNT(DISTINCT moduleName) AS modules, COUNT(DISTINCT blameModule) AS directModules, projectId FROM files_nm JOIN files ON files_nm.fileId = files.fileId GROUP BY projectId);
+```
+
+```{r}
+summary(sql.query("SELECT maxDepth FROM foo WHERE maxDepth > 0")[[1]])
+```
+
+```{r}
+summary(sql.query("SELECT modules FROM foo WHERE maxDepth > 0")[[1]])
+```
+
+To determine the most popular modules (blame modules), run the following SQL:
+
+```
+SELECT COUNT(DISTINCT projectId) as projects, blameModule FROM files_nm JOIN files ON files_nm.fileId = files.fileId GROUP BY blameModule ORDER BY projects DESC LIMIT 10;
+```
+
+To see how many projects have NPM files in them:
+
+```
+SELECT COUNT(DISTINCT projectId) FROM files WHERE npm != 0;
+```
+
+To determine most cloned projects:
+
+```
+java SccPreprocessor cstats PATH_TO_DATASET NUM_CHUNKS
+
+CREATE TABLE fully_cloned_projects(
+    projectId BIGINT NOT NULL,
+    clones INT NOT NULL,
+    PRIMARY KEY(projectId));
+LOAD DATA INFILE '/home/peta/datasets/js/fully_cloned_projects2.csv' INTO TABLE fully_cloned_projects FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';
+
+SELECT projectUrl, clones FROM fully_cloned_projects JOIN projects ON fully_cloned_projects.projectId = projects.projectId ORDER BY clones DESC LIMIT 40;
+```
+
+To determine which files are cloned the most:
+
+```
+SELECT COUNT(*) AS cnt FROM files GROUP BY fileHash ORDER BY cnt DESC LIMIT 20;
+```
+
+
+
+```
+SELECT COUNT(DISTINCT fileHash) AS distinct, COUNT(*) AS count FROM files WHERE projectId IN SELECT projectId FROM projects ORDER BY commits DESC LIMIT 10000 AS x;
+
+```

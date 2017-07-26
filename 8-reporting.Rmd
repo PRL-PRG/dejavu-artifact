@@ -83,28 +83,28 @@ metadataCorpus(DATASET_NAME)
 ## Fig 10 - Files per project distributions.
 
 ```{r}
-filesPerProjectDist(DATASET_NAME, DATASET_PATH)
+filesPerProjectDist(DATASET_NAME, DATASET_PATH, "Java")
 ```
 
 
 ## Fig 11 - SLOC per file distributions.
 
 ```{r}
-slocPerFileDist(DATASET_NAME)
+slocPerFileDist(DATASET_NAME, "Java")
 ```
 
 
 ## Fig 12 - Stars per project distributions.
 
 ```{r}
-starsPerProjectDist(DATASET_NAME, DATASET_PATH)
+starsPerProjectDist(DATASET_NAME, DATASET_PATH, "Java")
 ```
 
 
 ## Fig 13 - Commits per project distributions.
 
 ```{r}
-commitsPerProjectDist(DATASET_NAME, DATASET_PATH)
+commitsPerProjectDist(DATASET_NAME, DATASET_PATH, "Java")
 ```
 
 ## Table 7 -  Summary statistics for the entire dataset.
